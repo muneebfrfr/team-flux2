@@ -5,8 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider        = "prisma-client-js"
-  output          = "../src/generated/prisma"
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
   previewFeatures = ["mongoDb"]
 }
 
@@ -15,114 +15,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  username     String
+model Users {
+  id           String   @id @default(cuid()) @map("_id")
+  name         String
   email        String   @unique
   passwordHash String
   roles        String[] @default([])
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-
-  growthSessionsPresented GrowthSession[] @relation("Presenter")
-  actionItems             ActionItem[]    @relation("AssignedUser")
-  feedback                Feedback[]      @relation("FeedbackUser")
-  ownedTechnicalDebt      TechnicalDebt[] @relation("Owner")
-  comments                Comment[]       @relation("CommentUser")
-}
-
-model GrowthSession {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  topic         String
-  presenterId   String   @db.ObjectId
-  scheduledTime DateTime
-  notes         String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  presenter   User         @relation("Presenter", fields: [presenterId], references: [id])
-  actionItems ActionItem[]
-  feedback    Feedback[]
-}
-
-model ActionItem {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  description String
-  assignedTo  String   @db.ObjectId
-  status      String // enum not supported inline in MongoDB for Prisma
-  dueDate     DateTime
-
-  growthSession   GrowthSession? @relation(fields: [growthSessionId], references: [id])
-  growthSessionId String?        @db.ObjectId
-
-  assignedUser User @relation("AssignedUser", fields: [assignedTo], references: [id])
-}
-
-model Feedback {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String   @db.ObjectId
-  rating    Int
-  comments  String
-  createdAt DateTime @default(now())
-
-  growthSession   GrowthSession? @relation(fields: [growthSessionId], references: [id])
-  growthSessionId String?        @db.ObjectId
-
-  user User @relation("FeedbackUser", fields: [userId], references: [id])
-}
-
-model Project {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  description String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  technicalDebts TechnicalDebt[]
-  deprecations   Deprecation[]
-}
-
-model TechnicalDebt {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  projectId   String   @db.ObjectId
-  title       String
-  description String
-  ownerId     String   @db.ObjectId
-  priority    String // enum: Low | Medium | High
-  dueDate     DateTime
-  status      String // enum: open | in-review | closed
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  project  Project   @relation(fields: [projectId], references: [id])
-  owner    User      @relation("Owner", fields: [ownerId], references: [id])
-  comments Comment[]
-}
-
-model Comment {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String   @db.ObjectId
-  message   String
-  createdAt DateTime @default(now())
-
-  technicalDebt   TechnicalDebt? @relation(fields: [technicalDebtId], references: [id])
-  technicalDebtId String?        @db.ObjectId
-
-  user User @relation("CommentUser", fields: [userId], references: [id])
-}
-
-model Deprecation {
-  id                   String   @id @default(auto()) @map("_id") @db.ObjectId
-  projectId            String   @db.ObjectId
-  deprecatedItem       String
-  suggestedReplacement String
-  migrationNotes       String
-  timelineStart        DateTime
-  deadline             DateTime
-  progressStatus       String // enum: not started | in progress | completed
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
-
-  project                Project  @relation(fields: [projectId], references: [id])
-  linkedTechnicalDebtIds String[] @db.ObjectId
 }
