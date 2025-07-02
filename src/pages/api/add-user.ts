@@ -26,6 +26,7 @@
  */
 
 import type { NextApiRequest, NextApiResponse } from "next";
+import bcrypt from "bcryptjs";
 import prisma from "@/lib/db";
 
 export default async function handler(
@@ -39,11 +40,15 @@ export default async function handler(
   try {
     const { name, email, password } = req.body;
 
+    // Hash the password
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(password, salt);
+
     const newUser = await prisma.users.create({
       data: {
         name,
         email,
-        passwordHash: password,
+        passwordHash,
         roles: ["user"],
       },
     });
