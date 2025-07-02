@@ -1,4 +1,57 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/**
+ * @swagger
+ * /api/get-user:
+ *   get:
+ *     summary: Get a user by ID
+ *     tags:
+ *       - Users
+ *     parameters:
+ *       - in: query
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the user to fetch
+ *       - in: query
+ *         name: name
+ *         required: false
+ *         schema:
+ *           type: string
+ *         description: (Optional) Name parameter (not used currently)
+ *     responses:
+ *       200:
+ *         description: The user was found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 name:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 roles:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                 createdAt:
+ *                   type: string
+ *                   format: date-time
+ *                 updatedAt:
+ *                   type: string
+ *                   format: date-time
+ *       400:
+ *         description: Invalid ID
+ *       404:
+ *         description: User not found
+ *       405:
+ *         description: Method not allowed
+ *       500:
+ *         description: Internal server error
+ */
+
 import prisma from "@/lib/db";
 import type { NextApiRequest, NextApiResponse } from "next";
 

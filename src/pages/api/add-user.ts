@@ -1,10 +1,39 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import prisma from '@/lib/db';
-import type { NextApiRequest, NextApiResponse } from 'next';
+/**
+ * @swagger
+ * /api/add-user:
+ *   post:
+ *     summary: Add a new user
+ *     tags:
+ *       - Users
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: User successfully created
+ *       500:
+ *         description: Internal server error
+ */
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Only POST supported' });
+import type { NextApiRequest, NextApiResponse } from "next";
+import prisma from "@/lib/db";
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Only POST supported" });
   }
 
   try {
@@ -14,14 +43,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       data: {
         name,
         email,
-        passwordHash: password, // hash it later
-        roles: ['user'],
+        passwordHash: password,
+        roles: ["user"],
       },
     });
 
     return res.status(201).json(newUser);
   } catch (error) {
-    console.error('Error creating user:', error);
-    return res.status(500).json({ error: 'Failed to create user', message: (error as any).message });
+    console.error("Error creating user:", error);
+    return res.status(500).json({ error: "Failed to create user" });
   }
 }
