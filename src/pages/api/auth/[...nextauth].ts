@@ -1,5 +1,3 @@
-// pages/api/auth/[...nextauth].ts
-
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaClient } from "../../../generated/prisma"; // or "@/lib/prisma"
@@ -51,7 +49,7 @@ export default NextAuth({
     },
   },
   pages: {
-    signIn: "/login", // use custom login page
+    signIn: "/login", 
   },
   secret: process.env.NEXTAUTH_SECRET,
 });

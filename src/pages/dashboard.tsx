@@ -1,9 +1,9 @@
-
-
 import { getSession, GetSessionParams, useSession } from "next-auth/react";
 import LogoutButton from "@/components/LogoutButton";
 
-export async function getServerSideProps(context: GetSessionParams | undefined) {
+export async function getServerSideProps(
+  context: GetSessionParams | undefined
+) {
   const session = await getSession(context);
   if (!session) {
     return {

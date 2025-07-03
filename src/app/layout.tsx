@@ -1,8 +1,10 @@
 // src/app/layout.tsx
+
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css"; // Only if you still use global styles
-import ThemeRegistry from "@/components/ThemeRegistry"; // New wrapper we’ll create
+import "./globals.css";
+import ThemeRegistry from "@/components/ThemeRegistry";
+// import Navbar from "@/components/Navbar"; // adjust the path if needed
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,7 +21,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ThemeRegistry>{children}</ThemeRegistry>
+        <ThemeRegistry>
+          {/* <Navbar /> */}
+          <main>{children}</main>
+        </ThemeRegistry>
       </body>
     </html>
   );

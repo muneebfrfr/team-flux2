@@ -1,102 +1,136 @@
-// src/app/page.tsx
 "use client";
 
+import { useState } from "react";
+import { signIn } from "next-auth/react";
 import {
   Box,
   Button,
   Container,
+  TextField,
   Typography,
-  Link as MuiLink,
+  Paper,
 } from "@mui/material";
-import Image from "next/image";
-import Link from "next/link";
-import prisma from "@/lib/db";
+import EmailIcon from "@mui/icons-material/Email";
+import LockIcon from "@mui/icons-material/Lock";
 
-export default async function Home() {
-  const users = await prisma.users.findMany();
+export default function LoginPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const res = await signIn("credentials", {
+      redirect: true,
+      email,
+      password,
+      callbackUrl: "/dashboard",
+    });
+
+    console.log("Login response:", res);
+  };
 
   return (
-    <Container
-      sx={{
-        display: "flex",
-        minHeight: "100vh",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        gap: 4,
-        py: 8,
-      }}
-    >
-      <Image
-        src="/next.svg"
-        alt="Next.js logo"
-        width={180}
-        height={38}
-        priority
-        style={{ filter: "invert(1)" }}
-      />
-
-      <Box>
-        <Typography variant="h6" gutterBottom>
-          Get started by editing <code>src/app/page.tsx</code>
-        </Typography>
-        <Typography variant="body1">
-          Save and see your changes instantly.
-        </Typography>
-      </Box>
-
+    <Box sx={{ display: "flex", minHeight: "100vh" }}>
+      {/* Left Panel - Login */}
       <Box
         sx={{
+          width: { xs: "100%", md: "50%" },
           display: "flex",
-          gap: 2,
-          flexDirection: { xs: "column", sm: "row" },
+          justifyContent: "center",
+          alignItems: "center",
+          p: 4,
         }}
       >
-        <Button
-          variant="contained"
-          color="primary"
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          startIcon={
-            <Image
-              src="/vercel.svg"
-              alt="Vercel logo"
-              width={20}
-              height={20}
-              style={{ filter: "invert(1)" }}
+        <Paper
+          elevation={3}
+          sx={{ p: 5, width: "100%", maxWidth: 400, borderRadius: 4 }}
+        >
+          <Typography
+            variant="h4"
+            gutterBottom
+            sx={{ textAlign: "center", fontWeight: 500 }}
+          >
+            Get Started
+          </Typography>
+
+          <Box
+            component="form"
+            onSubmit={handleLogin}
+            sx={{ mt: 3, display: "flex", flexDirection: "column", gap: 3 }}
+          >
+            <TextField
+              label="Username"
+              type="email"
+              required
+              fullWidth
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              InputProps={{
+                startAdornment: <EmailIcon sx={{ mr: 1 }} />,
+              }}
             />
-          }
-        >
-          Deploy Now
-        </Button>
-        <Button
-          variant="outlined"
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-        >
-          Read our docs
-        </Button>
+            <TextField
+              label="Password"
+              type="password"
+              required
+              fullWidth
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              InputProps={{
+                startAdornment: <LockIcon sx={{ mr: 1 }} />,
+              }}
+            />
+
+            <Button
+              type="submit"
+              variant="contained"
+              fullWidth
+              sx={{
+                backgroundColor: "linear-gradient(to right, #764ba2, #667eea)",
+                "&:hover": { backgroundColor: "#3AC6C6" },
+                color: "#fff",
+                fontWeight: "bold",
+                borderRadius: "30px",
+                py: 1.5,
+              }}
+            >
+              SIGN IN
+            </Button>
+            <Typography variant="body2" sx={{ mt: 2, textAlign: "center" }}>
+              Don&apos;t have an account?{" "}
+              <Box
+                component="span"
+                sx={{ color: "#764ba2", cursor: "pointer", fontWeight: 600 }}
+                onClick={() => (window.location.href = "/signup")} // or use router.push('/signup') if using next/router
+              >
+                Sign up
+              </Box>
+            </Typography>
+          </Box>
+        </Paper>
       </Box>
 
+      {/* Right Panel - Welcome */}
       <Box
-        component="footer"
-        sx={{ display: "flex", gap: 4, flexWrap: "wrap", mt: 8 }}
+        sx={{
+          width: { xs: "0%", md: "50%" },
+          background: "linear-gradient(to right, #764ba2, #667eea)",
+          color: "#fff",
+          display: { xs: "none", md: "flex" },
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          p: 5,
+          textAlign: "center",
+        }}
       >
-        <MuiLink component={Link} href="/api-docs" underline="hover">
-          API Documentation
-        </MuiLink>
-        <MuiLink component={Link} href="/api/auth/signin" underline="hover">
-          Sign In
-        </MuiLink>
-        <MuiLink component={Link} href="/dashboard" underline="hover">
-          Dashboard
-        </MuiLink>
-      
-
-         <MuiLink component={Link} href="/signup" underline="hover">
-          Signup
-        </MuiLink>
+        <Typography variant="h5" sx={{ mb: 2 }}>
+          WELCOME TO
+        </Typography>
+        <Typography variant="h3" sx={{ fontWeight: 600, mb: 2 }}>
+          Team Flux
+        </Typography>
       </Box>
-    </Container>
+    </Box>
   );
 }
