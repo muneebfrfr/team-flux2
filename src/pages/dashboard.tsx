@@ -1,9 +1,9 @@
-// pages/dashboard.tsx
 
-import { getSession, useSession } from "next-auth/react";
+
+import { getSession, GetSessionParams, useSession } from "next-auth/react";
 import LogoutButton from "@/components/LogoutButton";
 
-export async function getServerSideProps(context) {
+export async function getServerSideProps(context: GetSessionParams | undefined) {
   const session = await getSession(context);
   if (!session) {
     return {

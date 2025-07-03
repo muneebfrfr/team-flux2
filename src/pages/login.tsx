@@ -1,6 +1,16 @@
 // pages/login.tsx
+
+'use client';
 import { signIn } from 'next-auth/react';
 import { useState } from 'react';
+import {
+  Container,
+  TextField,
+  Button,
+  Typography,
+  Box,
+  Paper,
+} from '@mui/material';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -19,35 +29,48 @@ export default function LoginPage() {
   };
 
   return (
-    <form
-      onSubmit={handleLogin}
-      className="max-w-sm mx-auto p-6 bg-#FF8800 rounded-xl shadow-md space-y-4"
-    >
+    <Container maxWidth="sm">
+      <Paper elevation={6} sx={{ p: 4, mt: 8, borderRadius: 3 }}>
+        <Typography variant="h5" align="center" gutterBottom>
+          Login to Your Account
+        </Typography>
 
-      <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Email"
-        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        required
-      />
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Password"
-        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        required
-      />
+        <Box
+          component="form"
+          onSubmit={handleLogin}
+          sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}
+        >
+          <TextField
+            label="Email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            fullWidth
+            variant="outlined"
+          />
 
-      <button
-        type="submit"
-        className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-300"
-      >
-        Login
-      </button>
+          <TextField
+            label="Password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            fullWidth
+            variant="outlined"
+          />
 
-    </form>
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            fullWidth
+            sx={{ mt: 2 }}
+          >
+            Login
+          </Button>
+        </Box>
+      </Paper>
+    </Container>
   );
 }
