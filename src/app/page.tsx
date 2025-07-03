@@ -1,77 +1,102 @@
-import prisma from "@/lib/db";
+// src/app/page.tsx
+"use client";
+
+import {
+  Box,
+  Button,
+  Container,
+  Typography,
+  Link as MuiLink,
+} from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
+import prisma from "@/lib/db";
 
 export default async function Home() {
   const users = await prisma.users.findMany();
-  // console.log("this is the information fetched for the users ->", users);
 
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <Container
+      sx={{
+        display: "flex",
+        minHeight: "100vh",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        gap: 4,
+        py: 8,
+      }}
+    >
+      <Image
+        src="/next.svg"
+        alt="Next.js logo"
+        width={180}
+        height={38}
+        priority
+        style={{ filter: "invert(1)" }}
+      />
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+      <Box>
+        <Typography variant="h6" gutterBottom>
+          Get started by editing <code>src/app/page.tsx</code>
+        </Typography>
+        <Typography variant="body1">
+          Save and see your changes instantly.
+        </Typography>
+      </Box>
+
+      <Box
+        sx={{
+          display: "flex",
+          gap: 2,
+          flexDirection: { xs: "column", sm: "row" },
+        }}
+      >
+        <Button
+          variant="contained"
+          color="primary"
+          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+          target="_blank"
+          startIcon={
             <Image
-              className="dark:invert"
               src="/vercel.svg"
-              alt="Vercel logomark"
+              alt="Vercel logo"
               width={20}
               height={20}
+              style={{ filter: "invert(1)" }}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[240px] flex-wrap items-center justify-center">
-        <Link href="/api-docs" className="hover:text-gray-300">
+          }
+        >
+          Deploy Now
+        </Button>
+        <Button
+          variant="outlined"
+          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+          target="_blank"
+        >
+          Read our docs
+        </Button>
+      </Box>
+
+      <Box
+        component="footer"
+        sx={{ display: "flex", gap: 4, flexWrap: "wrap", mt: 8 }}
+      >
+        <MuiLink component={Link} href="/api-docs" underline="hover">
           API Documentation
-        </Link> 
+        </MuiLink>
+        <MuiLink component={Link} href="/api/auth/signin" underline="hover">
+          Sign In
+        </MuiLink>
+        <MuiLink component={Link} href="/dashboard" underline="hover">
+          Dashboard
+        </MuiLink>
+      
 
-         <Link href="/api/auth/signin" className="hover:text-gray-300">
-          SIGNIN
-        </Link> 
-
-           <Link href="/dashboard" className="hover:text-gray-300">
-          dashboard
-        </Link> 
-           <Link href="login" className="hover:text-gray-300">
-          LOGIN 
-        </Link> 
-      </footer>
-    </div>
+         <MuiLink component={Link} href="/signup" underline="hover">
+          Signup
+        </MuiLink>
+      </Box>
+    </Container>
   );
 }

@@ -21,7 +21,7 @@ export default function LoginPage() {
   return (
     <form
       onSubmit={handleLogin}
-      className="max-w-sm mx-auto p-6 bg-white rounded-xl shadow-md space-y-4"
+      className="max-w-sm mx-auto p-6 bg-#FF8800 rounded-xl shadow-md space-y-4"
     >
 
       <input

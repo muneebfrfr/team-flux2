@@ -38,7 +38,7 @@ export default async function handler(
   }
 
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, roles } = req.body;
 
     // Hash the password
     const salt = await bcrypt.genSalt(10);

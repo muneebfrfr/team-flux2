@@ -1,18 +1,26 @@
-// src/pages/dashboard.tsx
+// pages/dashboard.tsx
 
-import { useSession } from 'next-auth/react';
+import { getSession, useSession } from "next-auth/react";
+import LogoutButton from "@/components/LogoutButton";
+
+export async function getServerSideProps(context) {
+  const session = await getSession(context);
+  if (!session) {
+    return {
+      redirect: { destination: "/login", permanent: false },
+    };
+  }
+
+  return { props: { session } };
+}
 
 export default function Dashboard() {
-  const { data: session, status } = useSession();
-
-  if (status === 'loading') return <p>Loading session...</p>;
-  if (!session) return <p>You are not logged in</p>;
+  const { data: session } = useSession();
 
   return (
-    <div>
-      <h1>Dashboard</h1>
-      <p>Welcome {session.user.email}</p>
-      <p>Roles: {session.user.roles.join(', ')}</p>
+    <div className="p-6">
+      <h1 className="text-2xl">Welcome, {session?.user?.email}</h1>
+      <LogoutButton />
     </div>
   );
 }

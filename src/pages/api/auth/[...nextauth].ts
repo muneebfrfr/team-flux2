@@ -1,6 +1,8 @@
+// pages/api/auth/[...nextauth].ts
+
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaClient } from "../../../generated/prisma";
+import { PrismaClient } from "../../../generated/prisma"; // or "@/lib/prisma"
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
@@ -31,15 +33,14 @@ export default NextAuth({
       },
     }),
   ],
+  session: {
+    strategy: "jwt",
+  },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        const dbUser = await prisma.users.findUnique({
-          where: { email: user.email },
-        });
-
-        token.roles = dbUser?.roles || ["Viewer"];
-        token.id = dbUser?.id;
+        token.id = user.id;
+        token.roles = user.roles;
       }
       return token;
     },
@@ -49,8 +50,8 @@ export default NextAuth({
       return session;
     },
   },
-  session: {
-    strategy: "jwt",
+  pages: {
+    signIn: "/login", // use custom login page
   },
   secret: process.env.NEXTAUTH_SECRET,
 });
