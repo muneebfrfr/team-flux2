@@ -1,4 +1,3 @@
-// pages/api/sessions/[id]/notes/index.ts
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/db";
 
@@ -14,16 +13,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     switch (method) {
-      case "GET":
+      case "GET": {
         const notes = await prisma.note.findMany({
           where: { sessionId: id },
         });
-        return res.status(200).json(notes);
 
-      case "POST":
+        return res.status(200).json({
+          message: "Notes fetched successfully",
+          data: notes,
+        });
+      }
+
+      case "POST": {
         const { content } = req.body;
-        if (!content) {
-          return res.status(400).json({ message: "Content is required" });
+
+        if (!content || typeof content !== "string") {
+          return res.status(400).json({ message: "Content is required and must be a string" });
         }
 
         const note = await prisma.note.create({
@@ -33,13 +38,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           },
         });
 
-        return res.status(201).json(note);
+        return res.status(201).json({
+          message: "Note created successfully",
+          data: note,
+        });
+      }
 
-      default:
+      default: {
         res.setHeader("Allow", ["GET", "POST"]);
-        return res.status(405).end(`Method ${method} Not Allowed`);
+        return res.status(405).json({
+          message: `Method ${method} Not Allowed`,
+        });
+      }
     }
   } catch (error: any) {
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({
+      message: "An error occurred while processing the request",
+      error: error.message,
+    });
   }
 }
