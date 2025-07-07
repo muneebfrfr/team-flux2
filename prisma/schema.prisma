@@ -10,45 +10,33 @@ datasource db {
 }
 
 model Users {
-  id                    String               @id @default(cuid()) @map("_id")
-  name                  String
-  email                 String               @unique
-  passwordHash          String
-  roles                 String[]             @default([])
-  sessions              Session[]            @relation("PresenterSessions")
-  assignedItems         ActionItem[]         @relation("AssignedItems")
-  notifications         Notification[]
-  participatingSessions SessionParticipant[] // New: Sessions the user participates in
-  createdAt             DateTime             @default(now())
-  updatedAt             DateTime             @updatedAt
+  id            String         @id @default(cuid()) @map("_id")
+  name          String
+  email         String         @unique
+  passwordHash  String
+  roles         String[]       @default([])
+  sessions      Session[]      @relation("PresenterSessions")
+  assignedItems ActionItem[]   @relation("AssignedItems")
+  notifications Notification[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 }
 
 model Session {
-  id           String               @id @default(cuid()) @map("_id")
-  topic        String
-  description  String?
-  presenter    Users                @relation("PresenterSessions", fields: [presenterId], references: [id])
-  presenterId  String
-  time         DateTime
-  notes        Note[]
-  actionItems  ActionItem[]
-  feedbacks    Feedback[]
-  calendarId   String? // For external calendar integration (e.g., Google Calendar event ID)
-  Notification Notification[]
-  participants SessionParticipant[] // New: Participants other than presenter
-  createdAt    DateTime             @default(now())
-  updatedAt    DateTime             @updatedAt
-}
-
-model SessionParticipant {
-  id        String   @id @default(cuid()) @map("_id")
-  user      Users    @relation(fields: [userId], references: [id])
-  userId    String
-  session   Session  @relation(fields: [sessionId], references: [id])
-  sessionId String
-  createdAt DateTime @default(now())
-
-  @@unique([userId, sessionId])
+  id             String         @id @default(cuid()) @map("_id")
+  topic          String
+  description    String?
+  presenter      Users          @relation("PresenterSessions", fields: [presenterId], references: [id])
+  presenterId    String
+  time           DateTime
+  notes          Note[]
+  actionItems    ActionItem[]
+  feedbacks      Feedback[]
+  sessionMembers String[]       @default([])
+  calendarId     String? // For external calendar integration (e.g., Google Calendar event ID)
+  Notification   Notification[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
 }
 
 model Note {

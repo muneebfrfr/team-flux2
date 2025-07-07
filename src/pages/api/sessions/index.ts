@@ -8,38 +8,80 @@ export default async function handler(
   if (req.method === "GET") {
     try {
       const sessions = await prisma.session.findMany({
-        include: { presenter: true, notes: true },
+        include: {
+          presenter: true,
+          notes: true,
+          feedbacks: true,
+          Notification: true,
+        },
       });
 
-      return res.status(200).json({
-        message: "Sessions fetched successfully",
-        data: sessions,
-      });
-    } catch (error) {
-      return res.status(500).json({
-        message: "Error fetching sessions",
-        error: error instanceof Error ? error.message : error,
-      });
+      return res
+        .status(200)
+        .json({ message: "Sessions fetched", data: sessions });
+    } catch (error: any) {
+      return res
+        .status(500)
+        .json({ message: "Failed to fetch sessions", error: error.message });
     }
   }
 
   if (req.method === "POST") {
+    const {
+      topic,
+      description,
+      presenterId,
+      time,
+      calendarId,
+      participantIds,
+    } = req.body;
+
+    if (!topic || !presenterId || !time) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
     try {
-      const { topic, description, presenterId, time, calendarId } = req.body;
-
+      // 1. Create session with participantIds as sessionMembers (string array)
       const session = await prisma.session.create({
-        data: { topic, description, presenterId, time, calendarId },
+        data: {
+          topic,
+          description,
+          presenterId,
+          time: new Date(time),
+          calendarId,
+          sessionMembers: participantIds || [],
+        },
       });
 
-      return res.status(201).json({
-        message: "Session created successfully",
-        data: session,
+      // 2. Create notifications for each participant
+      if (participantIds && participantIds.length > 0) {
+        const notifications = participantIds.map((userId: string) => ({
+          userId,
+          sessionId: session.id,
+          message: `You’ve been added as a participant in the session: ${session.topic}`,
+        }));
+
+        await prisma.notification.createMany({ data: notifications });
+      }
+
+      // 3. Return full session data
+      const fullSession = await prisma.session.findUnique({
+        where: { id: session.id },
+        include: {
+          presenter: true,
+          notes: true,
+          feedbacks: true,
+          Notification: true,
+        },
       });
-    } catch (error) {
-      return res.status(500).json({
-        message: "Error creating session",
-        error: error instanceof Error ? error.message : error,
-      });
+
+      return res
+        .status(201)
+        .json({ message: "Session created", data: fullSession });
+    } catch (error: any) {
+      return res
+        .status(500)
+        .json({ message: "Session creation failed", error: error.message });
     }
   }
 
