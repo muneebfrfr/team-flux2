@@ -1,11 +1,12 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { SessionProvider } from 'next-auth/react';
-import Navbar from '@/components/Navbar';
-import Sidebar from '@/components/Sidebar';
+import { useState } from "react";
+import { SessionProvider } from "next-auth/react";
+import Navbar from "@/components/Navbar";
+import Sidebar from "@/components/Sidebar";
+import { Box, CssBaseline, Toolbar } from "@mui/material";
 
-import { Box, CssBaseline, Toolbar } from '@mui/material';
+const SIDEBAR_WIDTH = 240;
 
 export default function DashboardLayoutClient({
   children,
@@ -20,28 +21,34 @@ export default function DashboardLayoutClient({
 
   return (
     <SessionProvider>
-      <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+      <Box sx={{ display: "flex", height: "100vh", overflow: "hidden" }}>
         <CssBaseline />
 
         {/* Sidebar */}
-        <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
         {/* Main Content Area */}
-        <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-          {/* Navbar */}
+        <Box
+          sx={{
+            flexGrow: 1,
+            display: "flex",
+            flexDirection: "column",
+            transition: "margin 0.3s ease",
+            ml: sidebarOpen ? `${SIDEBAR_WIDTH}px` : 0,
+          }}
+        >
           <Navbar onToggleSidebar={handleToggleSidebar} />
+          <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-          {/* This adds spacing equal to AppBar height */}
           <Toolbar />
 
-          {/* Main content */}
           <Box
             component="main"
             sx={{
               flexGrow: 1,
               p: 3,
-              bgcolor: 'grey.100',
-              overflow: 'auto',
+              bgcolor: "grey.100",
+              overflow: "auto",
+              transition: "margin 0.3s ease",
             }}
           >
             {children}
