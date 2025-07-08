@@ -1,5 +1,5 @@
 // src/app/profile/layout.tsx
-import DashboardLayoutClient from "../layout.client";
+
 export const metadata = {
   title: "Profile | Team Flux",
 };

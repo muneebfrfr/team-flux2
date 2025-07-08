@@ -22,10 +22,7 @@ export default function DashboardLayoutClient({
   return (
     <SessionProvider>
       <Box sx={{ display: "flex", height: "100vh", overflow: "hidden" }}>
-        <CssBaseline />
-
-        {/* Sidebar */}
-
+        {/* <CssBaseline /> */}
         {/* Main Content Area */}
         <Box
           sx={{
