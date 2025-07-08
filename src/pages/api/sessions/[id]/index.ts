@@ -1,7 +1,10 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/db";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   const {
     query: { id },
     method,
@@ -30,11 +33,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       case "PUT": {
-        const data = req.body;
+        const { topic, description, participants } = req.body;
 
         const updated = await prisma.session.update({
           where: { id },
-          data,
+          data: {
+            topic,
+            description,
+            sessionMembers: participants, 
+          },
         });
 
         return res.status(200).json({

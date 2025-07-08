@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import Link from "next/link";
-import EventNoteIcon from '@mui/icons-material/EventNote';
+import EventNoteIcon from "@mui/icons-material/EventNote";
 interface SidebarProps {
   open: boolean;
   width?: number;
@@ -50,7 +50,7 @@ export default function Sidebar({ open, width = 240, onClose }: SidebarProps) {
             href="/dashboard"
             style={{ width: "100%", textDecoration: "none" }}
           >
-            <ListItemButton onClick={onClose}>
+            <ListItemButton>
               <ListItemIcon sx={{ color: "#fff" }}>
                 <HomeIcon />
               </ListItemIcon>
@@ -65,7 +65,7 @@ export default function Sidebar({ open, width = 240, onClose }: SidebarProps) {
             href="/sessions"
             style={{ width: "100%", textDecoration: "none" }}
           >
-            <ListItemButton onClick={onClose}>
+            <ListItemButton>
               <ListItemIcon sx={{ color: "#fff" }}>
                 <EventNoteIcon />
               </ListItemIcon>

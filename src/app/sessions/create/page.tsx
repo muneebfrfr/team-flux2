@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -14,8 +14,8 @@ import {
   Checkbox,
   ListItemText,
   CircularProgress,
-} from '@mui/material';
-import axios from 'axios';
+} from "@mui/material";
+import axios from "axios";
 
 interface User {
   id: string;
@@ -23,40 +23,49 @@ interface User {
   email: string;
 }
 
+interface FormData {
+  topic: string;
+  description: string;
+  presenterId: string;
+  participantIds: string[];
+  time: string;
+  calendarId: string;
+}
+
 export default function SessionsPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({
-    topic: '',
-    description: '',
-    presenterId: '',
-    participantIds: [] as string[],
-    time: '',
-    calendarId: '',
+  const [form, setForm] = useState<FormData>({
+    topic: "",
+    description: "",
+    presenterId: "",
+    participantIds: [],
+    time: "",
+    calendarId: "",
   });
 
-  const fetchUsers = async () => {
-    try {
-      const res = await axios.get('/api/get-users');
-      setUsers(res.data);
-    } catch (err) {
-      console.error('Failed to fetch users', err);
-    }
-  };
+const fetchUsers = async () => {
+  try {
+    const res = await axios.get("/api/get-users");
+    setUsers(res.data.data); // ⬅️ Make sure you're assigning the actual array
+  } catch (err) {
+    console.error("Failed to fetch users", err);
+  }
+};
 
   const fetchSessions = async () => {
     try {
-      const res = await axios.get('/api/sessions');
+      const res = await axios.get("/api/sessions");
       setSessions(res.data.data);
     } catch (err) {
-      console.error('Failed to fetch sessions', err);
+      console.error("Failed to fetch sessions", err);
     }
   };
 
   const handleSubmit = async () => {
     if (!form.topic || !form.presenterId || !form.time) {
-      alert('Please fill in topic, presenter, and time.');
+      alert("Please fill in topic, presenter, and time.");
       return;
     }
 
@@ -68,22 +77,22 @@ export default function SessionsPage() {
         time: new Date(form.time).toISOString(),
       };
 
-      await axios.post('/api/sessions', payload);
+      await axios.post("/api/sessions", payload);
 
       await fetchSessions();
-      alert('Session created successfully!');
+      alert("Session created successfully!");
 
       setForm({
-        topic: '',
-        description: '',
-        presenterId: '',
+        topic: "",
+        description: "",
+        presenterId: "",
         participantIds: [],
-        time: '',
-        calendarId: '',
+        time: "",
+        calendarId: "",
       });
     } catch (err: any) {
-      console.error('Failed to create session', err);
-      alert(err?.response?.data?.message || 'Failed to create session');
+      console.error("Failed to create session", err);
+      alert(err?.response?.data?.message || "Failed to create session");
     } finally {
       setLoading(false);
     }
@@ -96,10 +105,14 @@ export default function SessionsPage() {
 
   return (
     <Box>
-      <Typography variant="h4" mb={3}>Sessions</Typography>
+      <Typography variant="h4" mb={3}>
+        Sessions
+      </Typography>
 
       <Box mb={4}>
-        <Typography variant="h6" gutterBottom>Create Session</Typography>
+        <Typography variant="h6" gutterBottom>
+          Create Session
+        </Typography>
 
         <TextField
           fullWidth
@@ -141,12 +154,15 @@ export default function SessionsPage() {
               const value = e.target.value;
               setForm({
                 ...form,
-                participantIds: typeof value === 'string' ? value.split(',') : value,
+                participantIds: Array.isArray(value) ? value : [],
               });
             }}
             input={<OutlinedInput label="Participants" />}
             renderValue={(selected) =>
-              users.filter((u) => selected.includes(u.id)).map((u) => u.name).join(', ')
+              users
+                .filter((u) => selected.includes(u.id))
+                .map((u) => u.name)
+                .join(", ")
             }
           >
             {users.map((user) => (
@@ -177,18 +193,13 @@ export default function SessionsPage() {
         />
 
         <Button variant="contained" onClick={handleSubmit} disabled={loading}>
-          {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Create Session'}
+          {loading ? (
+            <CircularProgress size={24} sx={{ color: "white" }} />
+          ) : (
+            "Create Session"
+          )}
         </Button>
       </Box>
-
-      <Typography variant="h6" mb={2}>Existing Sessions</Typography>
-      <ul>
-        {sessions.map((session: any) => (
-          <li key={session.id}>
-            <strong>{session.topic}</strong> – by {session.presenter?.name || 'Unknown'}
-          </li>
-        ))}
-      </ul>
     </Box>
   );
 }
