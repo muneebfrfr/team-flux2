@@ -52,8 +52,9 @@
  *         description: Internal server error
  */
 
-import prisma from "@/lib/db";
 import type { NextApiRequest, NextApiResponse } from "next";
+import prisma from "@/lib/db";
+import { requireAuth } from "@/lib/api-auth";
 
 export default async function handler(
   req: NextApiRequest,
@@ -63,20 +64,21 @@ export default async function handler(
     return res.status(405).json({ error: "Only GET method is supported" });
   }
 
+  // ✅ AUTH CHECK
+  const auth = await requireAuth(req, res);
+  if (!auth) return; // already responded with 401
+
   const {
-    query: { name, id },
-    method,
+    query: { id },
   } = req;
-  console.log("id->", id);
+
   if (typeof id !== "string") {
     return res.status(400).json({ error: "Invalid ID" });
   }
 
   try {
     const user = await prisma.users.findUnique({
-      where: {
-        id,
-      },
+      where: { id },
     });
 
     if (!user) {
