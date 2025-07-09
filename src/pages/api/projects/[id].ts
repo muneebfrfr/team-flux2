@@ -23,7 +23,7 @@ export default async function handler(
           include: {
             debts: {
               include: {
-                owner: true, // Include user who owns the debt item
+                owner: true,
                 comments: {
                   include: { user: true },
                 },
