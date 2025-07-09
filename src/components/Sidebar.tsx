@@ -14,6 +14,7 @@ import {
 import HomeIcon from "@mui/icons-material/Home";
 import Link from "next/link";
 import EventNoteIcon from "@mui/icons-material/EventNote";
+import Project from "@mui/icons-material/Laptop";
 interface SidebarProps {
   open: boolean;
   width?: number;
@@ -72,6 +73,21 @@ export default function Sidebar({ open, width = 240, onClose }: SidebarProps) {
               <ListItemText primary="Sessions" />
             </ListItemButton>
           </Link>
+        </ListItem>
+
+        {/* Project link */}
+        <ListItem disablePadding>
+          {/* <Link
+            href="/sessions"
+            style={{ width: "100%", textDecoration: "none" }}
+          > */}
+            <ListItemButton>
+              <ListItemIcon sx={{ color: "#fff" }}>
+                <Project />
+              </ListItemIcon>
+              <ListItemText primary="Projects" />
+            </ListItemButton>
+          {/* </Link> */}
         </ListItem>
       </List>
     </Drawer>
