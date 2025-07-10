@@ -1,9 +1,9 @@
-// /app/technical-debt/page.tsx
+// /app/projects/[id]/debt/page.tsx
 "use client";
 
 import {
   Box,
-  Button,
+  Typography,
   IconButton,
   Paper,
   Table,
@@ -11,38 +11,32 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  Typography,
   Chip,
 } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
-import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import Link from "next/link";
 
-export default function TechnicalDebtPage() {
-  const [debtItems, setDebtItems] = useState([]);
+export default function ProjectDebtPage() {
+  const { id } = useParams();
+  const [debts, setDebts] = useState([]);
+  const [project, setProject] = useState<any>(null);
 
-  const fetchDebt = async () => {
-    try {
-      const res = await axios.get("/api/technical-debt");
-      setDebtItems(res.data.data);
-    } catch (err) {
-      console.error("Error fetching technical debt:", err);
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this debt item?")) {
-      await axios.delete(`/api/technical-debt/${id}`);
-      fetchDebt();
-    }
+  const fetchData = async () => {
+    const [projectRes, debtRes] = await Promise.all([
+      axios.get(`/api/projects/${id}`),
+      axios.get(`/api/technical-debt/${id}`),
+    ]);
+    setProject(projectRes.data.data);
+    setDebts(debtRes.data.data);
   };
 
   useEffect(() => {
-    fetchDebt();
-  }, []);
+    if (id) fetchData();
+  }, [id]);
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -64,19 +58,19 @@ export default function TechnicalDebtPage() {
 
   return (
     <Box p={4}>
-      <Box display="flex" justifyContent="space-between" mb={3}>
-        <Typography variant="h4">Technical Debt Tracker</Typography>
-        <Link href="/technical-debt/new">
-          <Button variant="contained" startIcon={<AddIcon />}>Create New</Button>
-        </Link>
-      </Box>
+      <Typography variant="h4" mb={2}>Technical Debt for Project</Typography>
+      {project && (
+        <Box mb={3}>
+          <Typography variant="h6">{project.name}</Typography>
+          <Typography color="text.secondary">{project.description}</Typography>
+        </Box>
+      )}
 
       <Paper>
         <Table>
           <TableHead>
             <TableRow>
               <TableCell>Title</TableCell>
-              <TableCell>Project</TableCell>
               <TableCell>Priority</TableCell>
               <TableCell>Status</TableCell>
               <TableCell>Owner</TableCell>
@@ -85,10 +79,9 @@ export default function TechnicalDebtPage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {debtItems.map((item: any) => (
+            {debts.map((item: any) => (
               <TableRow key={item.id}>
                 <TableCell>{item.title}</TableCell>
-                <TableCell>{item.project?.name}</TableCell>
                 <TableCell>
                   <Chip label={item.priority} color={getPriorityColor(item.priority)} size="small" />
                 </TableCell>
@@ -101,7 +94,15 @@ export default function TechnicalDebtPage() {
                   <Link href={`/technical-debt/${item.id}/edit`}>
                     <IconButton color="primary"><EditIcon /></IconButton>
                   </Link>
-                  <IconButton color="error" onClick={() => handleDelete(item.id)}>
+                  <IconButton
+                    color="error"
+                    onClick={async () => {
+                      if (confirm("Are you sure you want to delete this item?")) {
+                        await axios.delete(`/api/technical-debt/${item.id}`);
+                        fetchData();
+                      }
+                    }}
+                  >
                     <DeleteIcon />
                   </IconButton>
                 </TableCell>
