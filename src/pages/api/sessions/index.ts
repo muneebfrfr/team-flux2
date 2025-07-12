@@ -1,10 +1,15 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/db";
+import { requireAuth } from "@/lib/api-auth"; // 👈 import auth check helper
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  // ✅ AUTH CHECK
+  const auth = await requireAuth(req, res);
+  if (!auth) return; // Already responded with 401 if unauthenticated
+
   if (req.method === "GET") {
     try {
       const sessions = await prisma.session.findMany({

@@ -1,11 +1,34 @@
 "use client";
 
-import { Box, Typography } from "@mui/material";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { Box, Typography, CircularProgress } from "@mui/material";
 import LoginForm from "@/components/LoginForm";
 
 export default function LoginScreen() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  if (status === "loading" || status === "authenticated") {
+    return (
+      <Box
+        sx={{
+          height: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   return (
-    <Box sx={{ display: "flex", position: "fixed", inset: 0, overflow: "hidden" }}>
+    <Box
+      sx={{ display: "flex", position: "fixed", inset: 0, overflow: "hidden" }}
+    >
       {/* Left Panel - Login Form */}
       <LoginForm />
 

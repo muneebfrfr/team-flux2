@@ -14,6 +14,8 @@ import {
 import HomeIcon from "@mui/icons-material/Home";
 import Link from "next/link";
 import EventNoteIcon from "@mui/icons-material/EventNote";
+import Project from "@mui/icons-material/Laptop";
+import ArticleIcon from '@mui/icons-material/Article';
 interface SidebarProps {
   open: boolean;
   width?: number;
@@ -70,6 +72,36 @@ export default function Sidebar({ open, width = 240, onClose }: SidebarProps) {
                 <EventNoteIcon />
               </ListItemIcon>
               <ListItemText primary="Sessions" />
+            </ListItemButton>
+          </Link>
+        </ListItem>
+
+        {/* Project link */}
+        <ListItem disablePadding>
+          <Link
+            href="/projects"
+            style={{ width: "100%", textDecoration: "none" }}
+          >
+            <ListItemButton>
+              <ListItemIcon sx={{ color: "#fff" }}>
+                <Project />
+              </ListItemIcon>
+              <ListItemText primary="Projects" />
+            </ListItemButton>
+          </Link>
+        </ListItem>
+
+           {/* Technical dept link */}
+        <ListItem disablePadding>
+          <Link
+            href="/technical-debt"
+            style={{ width: "100%", textDecoration: "none" }}
+          >
+            <ListItemButton>
+              <ListItemIcon sx={{ color: "#fff" }}>
+                <ArticleIcon />
+              </ListItemIcon>
+              <ListItemText primary="Technical Debt" />
             </ListItemButton>
           </Link>
         </ListItem>

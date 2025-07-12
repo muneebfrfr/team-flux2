@@ -3,17 +3,22 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Box, Typography, CircularProgress } from "@mui/material";
+import { useSession } from "next-auth/react";
 
 export default function SplashScreen() {
   const router = useRouter();
-
+  const { data: session, status } = useSession();
   useEffect(() => {
     const timeout = setTimeout(() => {
-      router.push("/login");
-    }, 0); 
+      if (status === "authenticated") {
+        router.push("/dashboard");
+      } else if (status !== "loading") {
+        router.push("/login");
+      }
+    }, 0);
 
-    return () => clearTimeout(timeout); 
-  }, [router]);
+    return () => clearTimeout(timeout);
+  }, [router, status]);
 
   return (
     <Box

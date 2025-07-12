@@ -1,4 +1,3 @@
-// components/LoginForm.tsx
 "use client";
 
 import { useState } from "react";
@@ -9,6 +8,7 @@ import {
   TextField,
   Typography,
   Paper,
+  CircularProgress,
 } from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
@@ -16,15 +16,18 @@ import LockIcon from "@mui/icons-material/Lock";
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false); // 👈 Loader state
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true); // 👈 Start loading
     await signIn("credentials", {
       redirect: true,
       email,
       password,
       callbackUrl: "/dashboard",
     });
+    setLoading(false); // This might not be reached if redirect happens
   };
 
   return (
@@ -81,6 +84,7 @@ export default function LoginForm() {
             type="submit"
             variant="contained"
             fullWidth
+            disabled={loading} // 👈 Disable when loading
             sx={{
               background: "linear-gradient(to right, #764ba2, #667eea)",
               "&:hover": { backgroundColor: "#3AC6C6" },
@@ -90,7 +94,11 @@ export default function LoginForm() {
               py: 1.5,
             }}
           >
-            SIGN IN
+            {loading ? (
+              <CircularProgress size={24} sx={{ color: "#fff" }} />
+            ) : (
+              "SIGN IN"
+            )}
           </Button>
 
           <Typography variant="body2" sx={{ mt: 2, textAlign: "center" }}>

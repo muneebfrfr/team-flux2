@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation"; // <-- if you're using App Router
+import { useRouter } from "next/navigation";
 import {
   Box,
   Button,
   TextField,
   Typography,
   Paper,
+  CircularProgress,
 } from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
@@ -17,21 +18,29 @@ export default function SignupForm() {
   const router = useRouter();
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false); // 👈 loading state
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true); // 👈 start loading
 
-    const res = await fetch("/api/add-user", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
+    try {
+      const res = await fetch("/api/add-user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
 
-    if (res.ok) {
-      router.push("/login");
-    } else {
-      const data = await res.json();
-      setError(data.error || "Signup failed");
+      if (res.ok) {
+        router.push("/login");
+      } else {
+        const data = await res.json();
+        setError(data.error || "Signup failed");
+        setLoading(false); // 👈 stop loading on failure
+      }
+    } catch (err) {
+      setError("Something went wrong");
+      setLoading(false); // 👈 stop loading on catch
     }
   };
 
@@ -101,6 +110,7 @@ export default function SignupForm() {
             type="submit"
             variant="contained"
             fullWidth
+            disabled={loading} // 👈 disable during loading
             sx={{
               background: "linear-gradient(to right, #764ba2, #667eea)",
               "&:hover": { backgroundColor: "#3AC6C6" },
@@ -110,7 +120,11 @@ export default function SignupForm() {
               py: 1.5,
             }}
           >
-            SIGN UP
+            {loading ? (
+              <CircularProgress size={24} sx={{ color: "#fff" }} />
+            ) : (
+              "SIGN UP"
+            )}
           </Button>
 
           {error && (
