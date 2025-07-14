@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { useState, useEffect } from "react";
+import { useSession, signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import {
   Box,
   Button,
@@ -14,22 +15,47 @@ import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
 
 export default function LoginForm() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false); // Loader state
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/dashboard");
+    }
+  }, [status, router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true); // Start loader
+    setLoading(true);
     await signIn("credentials", {
       redirect: true,
       email,
       password,
       callbackUrl: "/dashboard",
     });
-    // No need to setLoading(false) because redirect happens
   };
 
+  // Splash screen while checking session
+  if (status === "loading" || status === "authenticated") {
+    return (
+      <Box
+        sx={{
+          height: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <CircularProgress size={40} />
+      </Box>
+    );
+  }
+
+  // Login form if unauthenticated
   return (
     <Box
       sx={{
@@ -108,7 +134,7 @@ export default function LoginForm() {
             <Box
               component="span"
               sx={{ color: "#764ba2", cursor: "pointer", fontWeight: 600 }}
-              onClick={() => (window.location.href = "/signup")}
+              onClick={() => router.push("/signup")}
             >
               Sign up
             </Box>
