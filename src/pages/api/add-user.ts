@@ -4,7 +4,7 @@
  *   post:
  *     summary: Add a new user
  *     tags:
- *       - Users
+ *       - Authentication
  *     requestBody:
  *       required: true
  *       content:
