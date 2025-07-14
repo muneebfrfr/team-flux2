@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import {
   Box,
   Button,
@@ -18,14 +19,15 @@ export default function SignupForm() {
   const router = useRouter();
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false); // Loader state
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setLoading(true); // Start loader
+    setLoading(true);
 
     try {
+      // 1. Create user
       const res = await fetch("/api/add-user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -33,7 +35,17 @@ export default function SignupForm() {
       });
 
       if (res.ok) {
-        router.push("/login");
+        const loginRes = await signIn("credentials", {
+          redirect: false,
+          email: form.email,
+          password: form.password,
+        });
+
+        if (loginRes?.ok) {
+          router.push("/dashboard"); // 3. Redirect manually
+        } else {
+          setError("Signup succeeded but login failed.");
+        }
       } else {
         const data = await res.json();
         setError(data.error || "Signup failed");
@@ -41,7 +53,7 @@ export default function SignupForm() {
     } catch (err) {
       setError("Something went wrong.");
     } finally {
-      setLoading(false); // Stop loader
+      setLoading(false);
     }
   };
 
