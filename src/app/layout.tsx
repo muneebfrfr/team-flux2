@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import ThemeRegistry from "@/components/ThemeRegistry";
 import SessionWrapper from "@/components/SessionWrapper";
-import { Toaster } from "react-hot-toast"; // ✅ Import Toaster
+import { Toaster } from "react-hot-toast"; 
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,7 +21,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <SessionWrapper>
           <ThemeRegistry>
-            <Toaster position="top-right" />
+            <Toaster position="top-right" /> 
             <main>{children}</main>
           </ThemeRegistry>
         </SessionWrapper>
