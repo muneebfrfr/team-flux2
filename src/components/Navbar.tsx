@@ -4,16 +4,14 @@ import { useState } from "react";
 import { useSession } from "next-auth/react";
 import LogoutButton from "./LogoutButton";
 import DropdownItem from "./DropdownItem";
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  IconButton,
-  Menu,
-  MenuItem,
-  Box,
-  Divider,
-} from "@mui/material";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Box from "@mui/material/Box";
+import Divider from "@mui/material/Divider";
 
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -103,7 +101,7 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
             <Divider />
             <DropdownItem
               onClick={() => {
-                handleProfileClose(); 
+                handleProfileClose();
                 window.location.href = "/dashboard/profile";
               }}
             >

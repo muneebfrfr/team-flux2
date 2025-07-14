@@ -3,7 +3,10 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { Box, Typography, CircularProgress } from "@mui/material";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import CircularProgress from "@mui/material/CircularProgress";
+
 import LoginForm from "@/components/LoginForm";
 
 export default function LoginScreen() {

@@ -1,14 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Paper,
-  Stack,
-} from "@mui/material";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import Paper from "@mui/material/Paper";
+import Stack from "@mui/material/Stack";
 
 export default function ProfilePage() {
   const [editMode, setEditMode] = useState(false);

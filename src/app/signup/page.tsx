@@ -1,6 +1,8 @@
 "use client";
 
-import { Box, Typography } from "@mui/material";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+
 import SignupForm from "@/components/SignupForm";
 
 export default function SignupPage() {

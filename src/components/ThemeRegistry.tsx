@@ -1,7 +1,9 @@
 // src/components/ThemeRegistry.tsx
 "use client";
 
-import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
+import CssBaseline from "@mui/material/CssBaseline";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+
 
 const theme = createTheme({
   palette: {
