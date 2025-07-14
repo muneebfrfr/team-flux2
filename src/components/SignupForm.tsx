@@ -2,45 +2,61 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Box,
-  Button,
-  TextField,
-  Typography,
-  Paper,
-  CircularProgress,
-} from "@mui/material";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import Paper from "@mui/material/Paper";
+import CircularProgress from "@mui/material/CircularProgress";
+
 import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
 import PersonIcon from "@mui/icons-material/Person";
+import toast from "react-hot-toast";
+import { signIn } from "next-auth/react";
+import axios from "axios";
 
 export default function SignupForm() {
   const router = useRouter();
   const [form, setForm] = useState({ name: "", email: "", password: "" });
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false); // 👈 loading state
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true); // 👈 start loading
+    setLoading(true);
 
     try {
-      const res = await fetch("/api/add-user", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
+      const res = await axios.post("/api/auth/add-user", form);
 
-      if (res.ok) {
-        router.push("/login");
-      } else {
-        const data = await res.json();
-        setError(data.error || "Signup failed");
-        setLoading(false); // 👈 stop loading on failure
+      if (res.status === 201) {
+        toast.success("Signup successful! Logging you in...");
+
+        const loginResult = await signIn("credentials", {
+          redirect: false,
+          email: form.email,
+          password: form.password,
+        });
+
+        if (loginResult?.ok) {
+          toast.success("Logged in successfully!");
+          router.push("/dashboard");
+        } else {
+          toast.error("Signup succeeded but login failed.");
+        }
       }
-    } catch (err) {
-      setError("Something went wrong");
-      setLoading(false); // 👈 stop loading on catch
+    } catch (error: any) {
+      if (axios.isAxiosError(error)) {
+        const msg = error.response?.data?.error || "Signup failed. Try again.";
+        if (msg.includes("already exists")) {
+          toast.error("An account with this email already exists.");
+        } else {
+          toast.error(msg);
+        }
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -110,7 +126,7 @@ export default function SignupForm() {
             type="submit"
             variant="contained"
             fullWidth
-            disabled={loading} // 👈 disable during loading
+            disabled={loading}
             sx={{
               background: "linear-gradient(to right, #764ba2, #667eea)",
               "&:hover": { backgroundColor: "#3AC6C6" },
@@ -126,12 +142,6 @@ export default function SignupForm() {
               "SIGN UP"
             )}
           </Button>
-
-          {error && (
-            <Typography color="error" align="center" mt={1}>
-              {error}
-            </Typography>
-          )}
 
           <Typography variant="body2" sx={{ mt: 2, textAlign: "center" }}>
             Already have an account?{" "}

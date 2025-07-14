@@ -1,3 +1,81 @@
+/**
+ * @swagger
+ * /api/sessions/{id}/notes:
+ *   get:
+ *     summary: Get all notes for a session
+ *     tags:
+ *       - Notes
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the session
+ *         schema:
+ *           type: string
+ *           example: sess_abc123
+ *     responses:
+ *       200:
+ *         description: Notes fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Notes fetched successfully
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Note'
+ *       400:
+ *         description: Invalid session ID
+ *       500:
+ *         description: Server error
+ *
+ *   post:
+ *     summary: Create a new note for a session
+ *     tags:
+ *       - Notes
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the session
+ *         schema:
+ *           type: string
+ *           example: sess_abc123
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - content
+ *             properties:
+ *               content:
+ *                 type: string
+ *                 example: This is a discussion note from the session.
+ *     responses:
+ *       201:
+ *         description: Note created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Note created successfully
+ *                 data:
+ *                   $ref: '#/components/schemas/Note'
+ *       400:
+ *         description: Missing or invalid content
+ *       500:
+ *         description: Server error
+ */
+
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/db";
 

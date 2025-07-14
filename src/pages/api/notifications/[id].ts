@@ -1,3 +1,88 @@
+/**
+ * @swagger
+ * /api/notifications/{id}:
+ *   get:
+ *     summary: Get a single notification by ID
+ *     tags:
+ *       - Notifications
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Notification ID
+ *         schema:
+ *           type: string
+ *           example: notif_123abc
+ *     responses:
+ *       200:
+ *         description: Notification fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Notification'
+ *       400:
+ *         description: Invalid ID
+ *       404:
+ *         description: Notification not found
+ *       500:
+ *         description: Server error
+
+ *   put:
+ *     summary: Update a notification by ID
+ *     tags:
+ *       - Notifications
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Notification ID
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               message:
+ *                 type: string
+ *                 example: You’ve been invited to a session.
+ *               isRead:
+ *                 type: boolean
+ *                 example: true
+ *     responses:
+ *       200:
+ *         description: Notification updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Notification'
+ *       400:
+ *         description: Invalid ID
+ *       500:
+ *         description: Server error
+
+ *   delete:
+ *     summary: Delete a notification by ID
+ *     tags:
+ *       - Notifications
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Notification ID
+ *         schema:
+ *           type: string
+ *     responses:
+ *       204:
+ *         description: Notification deleted successfully
+ *       400:
+ *         description: Invalid ID
+ *       500:
+ *         description: Server error
+ */
+
 import { NextApiRequest, NextApiResponse } from 'next';
 import prisma from '@/lib/db';
 

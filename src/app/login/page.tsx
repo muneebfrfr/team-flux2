@@ -3,8 +3,12 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { Box, Typography, CircularProgress } from "@mui/material";
-import LoginForm from "@/components/LoginForm";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import CircularProgress from "@mui/material/CircularProgress";
+import dynamic from "next/dynamic";
+
+const LoginForm = dynamic(() => import("@/components/LoginForm"));
 
 export default function LoginScreen() {
   const { data: session, status } = useSession();
