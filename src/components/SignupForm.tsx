@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
+import axios from "axios";
 import {
   Box,
   Button,
@@ -26,16 +27,10 @@ export default function SignupForm() {
     setLoading(true);
 
     try {
-      // 1. Create user
-      const res = await fetch("/api/add-user", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
+      // 1. Create user using axios
+      const res = await axios.post("/api/add-user", form);
 
-      const data = await res.json();
-
-      if (res.ok) {
+      if (res.status === 201) {
         toast.success("Signup successful! Logging in...");
 
         // 2. Log in after signup
@@ -51,16 +46,12 @@ export default function SignupForm() {
         } else {
           toast.error("Signup succeeded but login failed.");
         }
-      } else {
-        // show specific backend errors via toast
-        if (data.error?.includes("already exists")) {
-          toast.error("An account with this email already exists.");
-        } else {
-          toast.error(data.error || "Signup failed.");
-        }
       }
-    } catch (err) {
-      toast.error("Something went wrong. Please try again.");
+    } catch (err: any) {
+      const msg = err?.response?.data?.error?.includes("already exists")
+        ? "An account with this email already exists."
+        : err?.response?.data?.error || "Signup failed.";
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
