@@ -14,16 +14,15 @@ import {
 import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
 import PersonIcon from "@mui/icons-material/Person";
+import toast from "react-hot-toast";
 
 export default function SignupForm() {
   const router = useRouter();
   const [form, setForm] = useState({ name: "", email: "", password: "" });
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
 
     try {
@@ -34,7 +33,12 @@ export default function SignupForm() {
         body: JSON.stringify(form),
       });
 
+      const data = await res.json();
+
       if (res.ok) {
+        toast.success("Signup successful! Logging in...");
+
+        // 2. Log in after signup
         const loginRes = await signIn("credentials", {
           redirect: false,
           email: form.email,
@@ -42,16 +46,21 @@ export default function SignupForm() {
         });
 
         if (loginRes?.ok) {
-          router.push("/dashboard"); // 3. Redirect manually
+          toast.success("Login successful! Redirecting...");
+          router.push("/dashboard");
         } else {
-          setError("Signup succeeded but login failed.");
+          toast.error("Signup succeeded but login failed.");
         }
       } else {
-        const data = await res.json();
-        setError(data.error || "Signup failed");
+        // show specific backend errors via toast
+        if (data.error?.includes("already exists")) {
+          toast.error("An account with this email already exists.");
+        } else {
+          toast.error(data.error || "Signup failed.");
+        }
       }
     } catch (err) {
-      setError("Something went wrong.");
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -142,12 +151,6 @@ export default function SignupForm() {
               "SIGN UP"
             )}
           </Button>
-
-          {error && (
-            <Typography color="error" align="center" mt={1}>
-              {error}
-            </Typography>
-          )}
 
           <Typography variant="body2" sx={{ mt: 2, textAlign: "center" }}>
             Already have an account?{" "}
