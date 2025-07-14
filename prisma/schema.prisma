@@ -12,7 +12,7 @@ datasource db {
 model Users {
   id            String         @id @default(cuid()) @map("_id")
   name          String
-  email         String         @unique
+  email         String         @unique 
   passwordHash  String
   roles         String[]       @default([])
   sessions      Session[]      @relation("PresenterSessions")

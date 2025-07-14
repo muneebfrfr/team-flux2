@@ -15,7 +15,8 @@ const options = {
       },
     ],
   },
-  apis: ["./src/pages/api/*.ts"], // ✅ Must match actual file path
+  // apis: ["./src/pages/api/*.ts"], // ✅ Must match actual file path
+  apis: ["./src/pages/api/**/*.ts"]
 };
 
 const swaggerSpec = swaggerJSDoc(options);

@@ -1,3 +1,85 @@
+/**
+ * @swagger
+ * /api/sessions/{id}/feedbacks:
+ *   get:
+ *     summary: Get feedbacks for a session
+ *     tags:
+ *       - Feedbacks
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the session
+ *         schema:
+ *           type: string
+ *           example: sess_abc123
+ *     responses:
+ *       200:
+ *         description: Feedbacks fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Feedbacks fetched successfully
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Feedback'
+ *       400:
+ *         description: Invalid session ID
+ *       500:
+ *         description: Server error
+ *
+ *   post:
+ *     summary: Submit feedback for a session
+ *     tags:
+ *       - Feedbacks
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the session
+ *         schema:
+ *           type: string
+ *           example: sess_abc123
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - rating
+ *             properties:
+ *               rating:
+ *                 type: number
+ *                 example: 4
+ *               comment:
+ *                 type: string
+ *                 example: Great session, learned a lot!
+ *     responses:
+ *       201:
+ *         description: Feedback submitted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Feedback submitted successfully
+ *                 data:
+ *                   $ref: '#/components/schemas/Feedback'
+ *       400:
+ *         description: Validation failed (e.g., missing or invalid rating)
+ *       500:
+ *         description: Server error
+ */
+
+
 // pages/api/sessions/[id]/feedbacks/index.ts
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/db";

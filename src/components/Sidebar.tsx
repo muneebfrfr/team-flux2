@@ -15,7 +15,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import Link from "next/link";
 import EventNoteIcon from "@mui/icons-material/EventNote";
 import Project from "@mui/icons-material/Laptop";
-import ArticleIcon from '@mui/icons-material/Article';
+import ArticleIcon from "@mui/icons-material/Article";
 interface SidebarProps {
   open: boolean;
   width?: number;
@@ -39,11 +39,7 @@ export default function Sidebar({ open, width = 240, onClose }: SidebarProps) {
         },
       }}
     >
-      <Box p={2}>
-        <Typography variant="h6" fontWeight="bold">
-          Menu
-        </Typography>
-      </Box>
+      <Box p={4}></Box>
       <Divider sx={{ borderColor: "rgba(255,255,255,0.2)" }} />
       <List>
         {/* Home Link */}
@@ -52,7 +48,7 @@ export default function Sidebar({ open, width = 240, onClose }: SidebarProps) {
             href="/dashboard"
             style={{ width: "100%", textDecoration: "none" }}
           >
-            <ListItemButton>
+            <ListItemButton sx={{ color: "#fff" }}>
               <ListItemIcon sx={{ color: "#fff" }}>
                 <HomeIcon />
               </ListItemIcon>
@@ -67,7 +63,7 @@ export default function Sidebar({ open, width = 240, onClose }: SidebarProps) {
             href="/sessions"
             style={{ width: "100%", textDecoration: "none" }}
           >
-            <ListItemButton>
+            <ListItemButton sx={{ color: "#fff" }}>
               <ListItemIcon sx={{ color: "#fff" }}>
                 <EventNoteIcon />
               </ListItemIcon>
@@ -82,7 +78,7 @@ export default function Sidebar({ open, width = 240, onClose }: SidebarProps) {
             href="/projects"
             style={{ width: "100%", textDecoration: "none" }}
           >
-            <ListItemButton>
+            <ListItemButton sx={{ color: "#fff" }}>
               <ListItemIcon sx={{ color: "#fff" }}>
                 <Project />
               </ListItemIcon>
@@ -91,13 +87,13 @@ export default function Sidebar({ open, width = 240, onClose }: SidebarProps) {
           </Link>
         </ListItem>
 
-           {/* Technical dept link */}
+        {/* Technical dept link */}
         <ListItem disablePadding>
           <Link
             href="/technical-debt"
             style={{ width: "100%", textDecoration: "none" }}
           >
-            <ListItemButton>
+            <ListItemButton sx={{ color: "#fff" }}>
               <ListItemIcon sx={{ color: "#fff" }}>
                 <ArticleIcon />
               </ListItemIcon>
