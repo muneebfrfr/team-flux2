@@ -3,7 +3,7 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
-import SignupForm from "@/components/SignupForm";
+import SignupForm from "@/components/auth/SignupForm";
 
 export default function SignupPage() {
   return (
