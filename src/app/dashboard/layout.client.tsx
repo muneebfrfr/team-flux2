@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { SessionProvider } from "next-auth/react";
+import Box from "@mui/material/Box";
+import Toolbar from "@mui/material/Toolbar";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
-import { Box, CssBaseline, Toolbar } from "@mui/material";
 
 const SIDEBAR_WIDTH = 240;
 
@@ -22,8 +23,6 @@ export default function DashboardLayoutClient({
   return (
     <SessionProvider>
       <Box sx={{ display: "flex", height: "100vh", overflow: "hidden" }}>
-        {/* <CssBaseline /> */}
-        {/* Main Content Area */}
         <Box
           sx={{
             flexGrow: 1,

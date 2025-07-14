@@ -1,8 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { Avatar, Box, TextField, Button, Paper, Grid } from "@mui/material";
-import PhoneInput from "react-phone-input-2";
+import Box from "@mui/material/Box";
+import Avatar from "@mui/material/Avatar";
+import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid";
+import Paper from "@mui/material/Paper";
+import TextField from "@mui/material/TextField";
+import dynamic from "next/dynamic";
+
+// Dynamically import phone input (heavy library)
+const PhoneInput = dynamic(() => import("react-phone-input-2"), {
+  ssr: false,
+});
 import "react-phone-input-2/lib/style.css";
 
 export default function ProfilePage() {
@@ -78,7 +88,7 @@ export default function ProfilePage() {
           </Grid>
         </Grid>
 
-        {/* Phone Number with Country Picker */}
+        {/* Phone Number */}
         <Box mb={2}>
           <PhoneInput
             country={"pk"}

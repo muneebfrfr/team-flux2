@@ -2,12 +2,15 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Box, Typography, CircularProgress } from "@mui/material";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import CircularProgress from "@mui/material/CircularProgress";
 import { useSession } from "next-auth/react";
 
 export default function SplashScreen() {
   const router = useRouter();
   const { data: session, status } = useSession();
+
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (status === "authenticated") {

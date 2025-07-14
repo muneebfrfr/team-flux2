@@ -57,30 +57,6 @@
  *                         type: string
  */
 
-/**
- * @swagger
- * /api/auth/signin:
- *   get:
- *     summary: Render custom login page
- *     tags:
- *       - Authentication
- *     responses:
- *       200:
- *         description: Login page HTML
- */
-
-/**
- * @swagger
- * /api/auth/signout:
- *   get:
- *     summary: Sign out the current user
- *     tags:
- *       - Authentication
- *     responses:
- *       200:
- *         description: Sign-out page HTML or redirect
- */
-
 import NextAuth from "next-auth";
 import { authOptions } from "@/lib/auth";
 

@@ -1,7 +1,11 @@
 "use client";
 
-import { Box, Typography } from "@mui/material";
-import SignupForm from "@/components/SignupForm";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import dynamic from "next/dynamic";
+
+// Dynamically load SignupForm to reduce initial JS bundle
+const SignupForm = dynamic(() => import("@/components/SignupForm"));
 
 export default function SignupPage() {
   return (

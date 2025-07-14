@@ -2,14 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Box,
-  Button,
-  TextField,
-  Typography,
-  Paper,
-  CircularProgress,
-} from "@mui/material";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import Paper from "@mui/material/Paper";
+import CircularProgress from "@mui/material/CircularProgress";
+
 import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
 import PersonIcon from "@mui/icons-material/Person";
@@ -27,13 +26,11 @@ export default function SignupForm() {
     setLoading(true);
 
     try {
-      // 1. Signup using axios
-      const res = await axios.post("/api/add-user", form);
+      const res = await axios.post("/api/auth/add-user", form);
 
       if (res.status === 201) {
         toast.success("Signup successful! Logging you in...");
 
-        // 2. Automatically login after signup
         const loginResult = await signIn("credentials", {
           redirect: false,
           email: form.email,
