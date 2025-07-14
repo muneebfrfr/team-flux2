@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation"; // <-- if you're using App Router
+import { useRouter } from "next/navigation";
 import {
   Box,
   Button,
   TextField,
   Typography,
   Paper,
+  CircularProgress,
 } from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
@@ -17,21 +18,30 @@ export default function SignupForm() {
   const router = useRouter();
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false); // Loader state
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+    setLoading(true); // Start loader
 
-    const res = await fetch("/api/add-user", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
+    try {
+      const res = await fetch("/api/add-user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
 
-    if (res.ok) {
-      router.push("/login");
-    } else {
-      const data = await res.json();
-      setError(data.error || "Signup failed");
+      if (res.ok) {
+        router.push("/login");
+      } else {
+        const data = await res.json();
+        setError(data.error || "Signup failed");
+      }
+    } catch (err) {
+      setError("Something went wrong.");
+    } finally {
+      setLoading(false); // Stop loader
     }
   };
 
@@ -67,6 +77,7 @@ export default function SignupForm() {
             required
             fullWidth
             value={form.name}
+            disabled={loading}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             InputProps={{
               startAdornment: <PersonIcon sx={{ mr: 1 }} />,
@@ -79,6 +90,7 @@ export default function SignupForm() {
             required
             fullWidth
             value={form.email}
+            disabled={loading}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
             InputProps={{
               startAdornment: <EmailIcon sx={{ mr: 1 }} />,
@@ -91,6 +103,7 @@ export default function SignupForm() {
             required
             fullWidth
             value={form.password}
+            disabled={loading}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
             InputProps={{
               startAdornment: <LockIcon sx={{ mr: 1 }} />,
@@ -101,6 +114,7 @@ export default function SignupForm() {
             type="submit"
             variant="contained"
             fullWidth
+            disabled={loading}
             sx={{
               background: "linear-gradient(to right, #764ba2, #667eea)",
               "&:hover": { backgroundColor: "#3AC6C6" },
@@ -110,7 +124,11 @@ export default function SignupForm() {
               py: 1.5,
             }}
           >
-            SIGN UP
+            {loading ? (
+              <CircularProgress size={24} sx={{ color: "#fff" }} />
+            ) : (
+              "SIGN UP"
+            )}
           </Button>
 
           {error && (
