@@ -1,24 +1,34 @@
-"use client";
-
+import type { Metadata } from "next";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
-import SignupForm from "@/components/auth/SignupForm";
+export const metadata: Metadata = {
+  title: "Auth | Team Flux",
+};
 
-export default function SignupPage() {
+export default function AuthLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <Box
-      sx={{
-        display: "flex",
-        position: "fixed",
-        inset: 0,
-        overflow: "hidden",
-      }}
+      sx={{ display: "flex", position: "fixed", inset: 0, overflow: "hidden" }}
     >
-      {/* Left Panel - Signup Form */}
-      <SignupForm />
+      {/* Left Panel: Centered form content */}
+      <Box
+        sx={{
+          flex: 1,
+          backgroundColor: "#f0f2f5",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        {children}
+      </Box>
 
-      {/* Right Panel - Welcome */}
+      {/* Right Panel: Branding */}
       <Box
         sx={{
           width: { xs: "0%", md: "50%" },

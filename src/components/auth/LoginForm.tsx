@@ -149,7 +149,7 @@ export default function LoginForm() {
                 cursor: "pointer",
                 fontWeight: 600,
               }}
-              onClick={() => router.replace("/signup")}
+              onClick={() => router.replace("/auth/signup")}
             >
               Sign up
             </Box>

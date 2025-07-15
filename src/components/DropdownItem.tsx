@@ -39,7 +39,7 @@ export function LogoutDropdownItem() {
   return (
     <ThemeRegistry>
       <DropdownItem
-        onClick={() => signOut({ callbackUrl: "/login" })}
+        onClick={() => signOut({ callbackUrl: "/auth/login" })}
         color="error.main"
       >
         Logout
