@@ -46,11 +46,15 @@ export default function SignupForm() {
           toast.error("Signup succeeded but login failed.");
         }
       }
-    } catch (err: any) {
-      const msg = err?.response?.data?.error?.includes("already exists")
-        ? "An account with this email already exists."
-        : err?.response?.data?.error || "Signup failed.";
-      toast.error(msg);
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        const msg = err?.response?.data?.error?.includes("already exists")
+          ? "An account with this email already exists."
+          : err?.response?.data?.error || "Signup failed.";
+        toast.error(msg);
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
     } finally {
       setLoading(false);
     }

@@ -1,3 +1,4 @@
+// eslint.config.js
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import { FlatCompat } from "@eslint/eslintrc";
@@ -10,7 +11,18 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
+  // Extend Next.js default rules
   ...compat.extends("next/core-web-vitals", "next/typescript"),
+
+  // ❌ Ignore specific folders/files
+  {
+    ignores: [
+      "src/generated/**", // ignore Prisma-generated code
+      "src/pages/api/**", // ignore API route handlers
+      "src/types/**",
+      ".next/**" // ignore global type declarations
+    ],
+  },
 ];
 
 export default eslintConfig;

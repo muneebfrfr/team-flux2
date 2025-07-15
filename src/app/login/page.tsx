@@ -10,7 +10,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import LoginForm from "@/components/auth/LoginForm";
 
 export default function LoginScreen() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
 
   useEffect(() => {

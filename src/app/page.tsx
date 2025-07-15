@@ -10,7 +10,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 
 export default function SplashScreen() {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { status } = useSession();
 
   useEffect(() => {
     if (status === "loading") return;

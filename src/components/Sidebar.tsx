@@ -17,7 +17,7 @@ interface SidebarProps {
   onClose: () => void;
 }
 
-export default function Sidebar({ open, width = 240, onClose }: SidebarProps) {
+export default function Sidebar({ open, width = 240 }: SidebarProps) {
   return (
     <Drawer
       variant="persistent"
