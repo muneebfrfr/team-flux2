@@ -3,17 +3,21 @@
 import { useState, useEffect } from "react";
 import { useSession, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import CircularProgress from "@mui/material/CircularProgress";
+import InputAdornment from "@mui/material/InputAdornment";
+import useTheme from "@mui/material/styles/useTheme";
 
 import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
 
 export default function LoginForm() {
+  const theme = useTheme();
   const { status } = useSession();
   const router = useRouter();
 
@@ -88,7 +92,11 @@ export default function LoginForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             InputProps={{
-              startAdornment: <EmailIcon sx={{ mr: 1 }} />,
+              startAdornment: (
+                <InputAdornment position="start">
+                  <EmailIcon sx={{ color: theme.palette.brand.contrastText }} />
+                </InputAdornment>
+              ),
             }}
             disabled={loading}
           />
@@ -100,7 +108,11 @@ export default function LoginForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             InputProps={{
-              startAdornment: <LockIcon sx={{ mr: 1 }} />,
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LockIcon sx={{ color: theme.palette.brand.contrastText }} />
+                </InputAdornment>
+              ),
             }}
             disabled={loading}
           />
@@ -111,8 +123,10 @@ export default function LoginForm() {
             fullWidth
             disabled={loading}
             sx={{
-              background: "linear-gradient(to right, #764ba2, #667eea)",
-              "&:hover": { backgroundColor: "#3AC6C6" },
+              background: `linear-gradient(to right, ${theme.palette.secondary.main}, ${theme.palette.primary.main})`,
+              "&:hover": {
+                backgroundColor: theme.palette.primary.dark,
+              },
               color: "#fff",
               fontWeight: "bold",
               borderRadius: "30px",
@@ -130,8 +144,12 @@ export default function LoginForm() {
             Don&apos;t have an account?{" "}
             <Box
               component="span"
-              sx={{ color: "#764ba2", cursor: "pointer", fontWeight: 600 }}
-              onClick={() => router.push("/signup")}
+              sx={{
+                color: theme.palette.secondary.main,
+                cursor: "pointer",
+                fontWeight: 600,
+              }}
+              onClick={() => router.replace("/signup")}
             >
               Sign up
             </Box>

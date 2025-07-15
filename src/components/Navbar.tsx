@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useSession } from "next-auth/react";
-import LogoutButton from "./LogoutButton";
-import DropdownItem from "./DropdownItem";
+import DropdownItem, { LogoutDropdownItem } from "./DropdownItem";
+
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
@@ -17,12 +17,15 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import MenuIcon from "@mui/icons-material/Menu";
 
+import { useTheme } from "@mui/material/styles";
+
 interface NavbarProps {
   onToggleSidebar: () => void;
 }
 
 export default function Navbar({ onToggleSidebar }: NavbarProps) {
   const { data: session } = useSession();
+  const theme = useTheme();
 
   const [notifAnchorEl, setNotifAnchorEl] = useState<null | HTMLElement>(null);
   const [profileAnchorEl, setProfileAnchorEl] = useState<null | HTMLElement>(
@@ -50,24 +53,26 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
       position="fixed"
       elevation={0}
       sx={{
-        backgroundColor: "#fff",
-        borderBottom: "1px solid #e0e0e0",
-        zIndex: (theme) => theme.zIndex.drawer + 1,
+        backgroundColor: theme.palette.brand.main,
+        color: theme.palette.brand.contrastText,
+        borderBottom: `1px solid ${theme.palette.divider}`,
+        zIndex: (t) => t.zIndex.drawer + 1,
       }}
     >
       <Toolbar sx={{ justifyContent: "space-between" }}>
+        {/* Left section */}
         <Box display="flex" alignItems="center" gap={2}>
-          <IconButton color="primary" onClick={onToggleSidebar}>
+          <IconButton onClick={onToggleSidebar} sx={{ color: "inherit" }}>
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" color="primary" fontWeight="bold">
+          <Typography variant="h6" fontWeight="bold">
             Team Flux
           </Typography>
         </Box>
 
-        {/* Right Section */}
+        {/* Right section */}
         <Box display="flex" alignItems="center" gap={2}>
-          <IconButton color="primary" onClick={handleNotifOpen}>
+          <IconButton onClick={handleNotifOpen} sx={{ color: "inherit" }}>
             <NotificationsIcon />
           </IconButton>
           <Menu
@@ -80,7 +85,7 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
             <MenuItem disabled>No new notifications</MenuItem>
           </Menu>
 
-          <IconButton color="primary" onClick={handleProfileOpen}>
+          <IconButton onClick={handleProfileOpen} sx={{ color: "inherit" }}>
             <AccountCircleIcon />
           </IconButton>
           <Menu
@@ -108,9 +113,8 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
               Profile
             </DropdownItem>
 
-            <DropdownItem>
-              <LogoutButton />
-            </DropdownItem>
+            {/* ✅ Direct logout dropdown item */}
+            <LogoutDropdownItem />
           </Menu>
         </Box>
       </Toolbar>

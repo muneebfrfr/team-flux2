@@ -8,16 +8,19 @@ import ListItemText from "@mui/material/ListItemText";
 import Divider from "@mui/material/Divider";
 import Box from "@mui/material/Box";
 import ListItemButton from "@mui/material/ListItemButton";
-
 import HomeIcon from "@mui/icons-material/Home";
 import Link from "next/link";
+import { useTheme } from "@mui/material/styles";
+
 interface SidebarProps {
   open: boolean;
   width?: number;
   onClose: () => void;
 }
 
-export default function Sidebar({ open, width = 240 }: SidebarProps) {
+export default function Sidebar({ open, width = 240}: SidebarProps) {
+  const theme = useTheme();
+
   return (
     <Drawer
       variant="persistent"
@@ -29,8 +32,8 @@ export default function Sidebar({ open, width = 240 }: SidebarProps) {
         "& .MuiDrawer-paper": {
           width,
           boxSizing: "border-box",
-          background: "linear-gradient(to bottom, #764ba2, #667eea)",
-          color: "#fff",
+          background: `linear-gradient(to bottom, ${theme.palette.secondary.main}, ${theme.palette.primary.main})`, // ✅ Use theme colors
+          color: theme.palette.brand.contrastText,
         },
       }}
     >
@@ -43,8 +46,8 @@ export default function Sidebar({ open, width = 240 }: SidebarProps) {
             href="/dashboard"
             style={{ width: "100%", textDecoration: "none" }}
           >
-            <ListItemButton sx={{ color: "#fff" }}>
-              <ListItemIcon sx={{ color: "#fff" }}>
+            <ListItemButton sx={{ color: theme.palette.brand.main }}>
+              <ListItemIcon sx={{ color: theme.palette.brand.main }}>
                 <HomeIcon />
               </ListItemIcon>
               <ListItemText primary="Home" />

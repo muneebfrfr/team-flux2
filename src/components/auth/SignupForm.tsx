@@ -4,19 +4,24 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import axios from "axios";
+
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import CircularProgress from "@mui/material/CircularProgress";
+import InputAdornment from "@mui/material/InputAdornment";
+import useTheme from "@mui/material/styles/useTheme";
 
 import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
 import PersonIcon from "@mui/icons-material/Person";
+
 import toast from "react-hot-toast";
 
 export default function SignupForm() {
+  const theme = useTheme();
   const router = useRouter();
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
@@ -26,13 +31,11 @@ export default function SignupForm() {
     setLoading(true);
 
     try {
-      // 1. Create user using axios
       const res = await axios.post("/api/add-user", form);
 
       if (res.status === 201) {
         toast.success("Signup successful! Logging in...");
 
-        // 2. Log in after signup
         const loginRes = await signIn("credentials", {
           redirect: false,
           email: form.email,
@@ -95,7 +98,13 @@ export default function SignupForm() {
             disabled={loading}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             InputProps={{
-              startAdornment: <PersonIcon sx={{ mr: 1 }} />,
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PersonIcon
+                    sx={{ color: theme.palette.brand.contrastText }}
+                  />
+                </InputAdornment>
+              ),
             }}
           />
 
@@ -108,7 +117,11 @@ export default function SignupForm() {
             disabled={loading}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
             InputProps={{
-              startAdornment: <EmailIcon sx={{ mr: 1 }} />,
+              startAdornment: (
+                <InputAdornment position="start">
+                  <EmailIcon sx={{ color: theme.palette.brand.contrastText }} />
+                </InputAdornment>
+              ),
             }}
           />
 
@@ -121,7 +134,11 @@ export default function SignupForm() {
             disabled={loading}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
             InputProps={{
-              startAdornment: <LockIcon sx={{ mr: 1 }} />,
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LockIcon sx={{ color: theme.palette.brand.contrastText }} />
+                </InputAdornment>
+              ),
             }}
           />
 
@@ -131,8 +148,10 @@ export default function SignupForm() {
             fullWidth
             disabled={loading}
             sx={{
-              background: "linear-gradient(to right, #764ba2, #667eea)",
-              "&:hover": { backgroundColor: "#3AC6C6" },
+              background: `linear-gradient(to right, ${theme.palette.secondary.main}, ${theme.palette.primary.main})`,
+              "&:hover": {
+                backgroundColor: theme.palette.primary.dark,
+              },
               color: "#fff",
               fontWeight: "bold",
               borderRadius: "30px",
@@ -151,11 +170,11 @@ export default function SignupForm() {
             <Box
               component="span"
               sx={{
-                color: "#764ba2",
+                color: theme.palette.secondary.main,
                 cursor: "pointer",
                 fontWeight: 600,
               }}
-              onClick={() => router.push("/login")}
+              onClick={() => router.replace("/login")}
             >
               Sign in
             </Box>

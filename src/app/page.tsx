@@ -3,10 +3,12 @@
 import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
 
+import ThemeRegistry from "@/components/ThemeRegistry"; // adjust the path if needed
 
 export default function SplashScreen() {
   const router = useRouter();
@@ -27,22 +29,24 @@ export default function SplashScreen() {
   }, [status, router]);
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: "100vh",
-        width: "100vw",
-        backgroundColor: "#000",
-        color: "#fff",
-      }}
-    >
-      <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
-        Welcome to TeamFlux
-      </Typography>
-      <CircularProgress color="inherit" />
-    </Box>
+    <ThemeRegistry>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+          width: "100vw",
+          backgroundColor: "#000",
+          color: "#fff",
+        }}
+      >
+        <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
+          Welcome to TeamFlux
+        </Typography>
+        <CircularProgress color="inherit" />
+      </Box>
+    </ThemeRegistry>
   );
 }
