@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { useSession } from "next-auth/react";
-import LogoutButton from "./LogoutButton";
-import DropdownItem from "./DropdownItem";
+import DropdownItem, { LogoutDropdownItem } from "./DropdownItem"; // ✅ updated
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
@@ -99,6 +98,7 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
               </Typography>
             </Box>
             <Divider />
+
             <DropdownItem
               onClick={() => {
                 handleProfileClose();
@@ -108,9 +108,8 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
               Profile
             </DropdownItem>
 
-            <DropdownItem>
-              <LogoutButton />
-            </DropdownItem>
+            {/* ✅ New logout item directly */}
+            <LogoutDropdownItem />
           </Menu>
         </Box>
       </Toolbar>

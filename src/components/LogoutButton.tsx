@@ -1,14 +1,15 @@
-"use client";
+// "use client";
 
-import { signOut } from "next-auth/react";
+// import { signOut } from "next-auth/react";
+// import DropdownItem from "./DropdownItem";
 
-export default function LogoutButton() {
-  return (
-    <button
-      onClick={() => signOut({ callbackUrl: "/login" })}
-      className="text-red-600 hover:underline"
-    >
-      Logout
-    </button>
-  );
-}
+// export default function LogoutButton() {
+//   return (
+//     <DropdownItem
+//       onClick={() => signOut({ callbackUrl: "/login" })}
+//       color="error.main"
+//     >
+//       Logout
+//     </DropdownItem>
+//   );
+// }
