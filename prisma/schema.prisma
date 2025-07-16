@@ -5,8 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
+  provider        = "prisma-client-js"
+  output          = "../src/generated/prisma"
   previewFeatures = ["mongoDb"]
 }
 
@@ -23,4 +23,63 @@ model Users {
   roles        String[] @default([])
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  // Relations
+  technicalDebtsOwned TechnicalDebt[] @relation("OwnerRelation")
+  comments            Comment[]       @relation("CommentUser")
+}
+
+model Projects {
+  id          String   @id @default(cuid()) @map("_id")
+  name        String
+  color       String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  technicalDebts TechnicalDebt[]
+}
+
+model TechnicalDebt {
+  id          String    @id @default(cuid()) @map("_id")
+  projectId   String
+  title       String
+  description String
+  ownerId     String
+  priority    Priority
+  dueDate     DateTime?
+  status      Status    @default(open)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  project  Projects  @relation(fields: [projectId], references: [id])
+  owner    Users     @relation("OwnerRelation", fields: [ownerId], references: [id])
+  comments Comment[]
+}
+
+model Comment {
+  id              String   @id @default(cuid()) @map("_id")
+  technicalDebtId String
+  userId          String
+  message         String
+  createdAt       DateTime @default(now())
+
+  // Relations
+  technicalDebt TechnicalDebt @relation(fields: [technicalDebtId], references: [id])
+  user          Users         @relation("CommentUser", fields: [userId], references: [id])
+}
+
+// Enums
+enum Priority {
+  Low
+  Medium
+  High
+}
+
+enum Status {
+  open
+  in_review
+  closed
 }
