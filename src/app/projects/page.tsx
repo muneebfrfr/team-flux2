@@ -13,6 +13,8 @@ import TableRow from "@mui/material/TableRow";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
+import CircularProgress from "@mui/material/CircularProgress"; // 👈 new import
+import route from "@/route";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -27,6 +29,7 @@ type Project = {
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [creating, setCreating] = useState(false); // 👈 loader state
   const router = useRouter();
 
   const fetchProjects = async () => {
@@ -39,6 +42,11 @@ export default function ProjectsPage() {
       await axios.delete(`/api/projects/${id}`);
       fetchProjects();
     }
+  };
+
+  const handleCreateProject = async () => {
+    setCreating(true);
+    router.push(route.projectsNew);
   };
 
   useEffect(() => {
@@ -54,11 +62,19 @@ export default function ProjectsPage() {
         mb={3}
       >
         <Typography variant="h4">All Projects</Typography>
-        <Link href="/projects/new">
-          <Button variant="contained" startIcon={<AddIcon />}>
-            Create New Project
-          </Button>
-        </Link>
+
+        <Button
+          variant="contained"
+          startIcon={!creating ? <AddIcon /> : null}
+          onClick={handleCreateProject}
+          disabled={creating}
+        >
+          {creating ? (
+            <CircularProgress size={20} color="inherit" />
+          ) : (
+            "Create New Project"
+          )}
+        </Button>
       </Box>
 
       <Paper>
