@@ -1,37 +1,53 @@
 "use client";
 
 import { useEffect } from "react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Box, Typography, CircularProgress } from "@mui/material";
+
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import CircularProgress from "@mui/material/CircularProgress";
+
+import ThemeRegistry from "@/components/ThemeRegistry";
+import route from "@/route";
 
 export default function SplashScreen() {
   const router = useRouter();
+  const { status } = useSession();
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      router.push("/login");
-    }, 1500); 
+    if (status === "loading") return;
 
-    return () => clearTimeout(timeout); // cleanup
-  }, [router]);
+    const timeout = setTimeout(() => {
+      if (status === "authenticated") {
+        router.push(route.dashboard);
+      } else {
+        router.push(route.login);
+      }
+    }, 1500);
+
+    return () => clearTimeout(timeout);
+  }, [status, router]);
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: "100vh",
-        width: "100vw",
-        backgroundColor: "#000",
-        color: "#fff",
-      }}
-    >
-      <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
-        Welcome to TeamFlux
-      </Typography>
-      <CircularProgress color="inherit" />
-    </Box>
+    <ThemeRegistry>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+          width: "100vw",
+          backgroundColor: "#000",
+          color: "#fff",
+        }}
+      >
+        <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
+          Welcome to TeamFlux
+        </Typography>
+        <CircularProgress color="inherit" />
+      </Box>
+    </ThemeRegistry>
   );
 }

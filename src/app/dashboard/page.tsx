@@ -1,6 +1,5 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import LogoutButton from "@/components/LogoutButton";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -8,7 +7,7 @@ export default async function DashboardPage() {
   return (
     <div className="p-6">
       <h1 className="text-2xl font-semibold">
-        Welcome, {session?.user?.email ?? "Guest"}
+        Welcome, {session?.user?.name ?? "Guest"}
       </h1>
     </div>
   );
