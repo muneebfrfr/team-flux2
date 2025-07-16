@@ -15,7 +15,7 @@ import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
 
 import AppTextField from "@/components/ui/AppTextField";
-
+import route from "@/route";
 export default function LoginForm() {
   const theme = useTheme();
   const { status } = useSession();
@@ -27,7 +27,7 @@ export default function LoginForm() {
 
   useEffect(() => {
     if (status === "authenticated") {
-      router.replace("/dashboard");
+      router.replace(route.dashboard);
     }
   }, [status, router]);
 
@@ -140,7 +140,7 @@ export default function LoginForm() {
                 cursor: "pointer",
                 fontWeight: 600,
               }}
-              onClick={() => router.replace("/auth/signup")}
+              onClick={() => router.replace(route.signup)}
             >
               Sign up
             </Box>

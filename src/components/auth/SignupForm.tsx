@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import axios from "axios";
-
+import route from "@/route";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
@@ -17,7 +17,7 @@ import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
 
 import toast from "react-hot-toast";
-import AppTextField from "@/components/ui/AppTextField"; 
+import AppTextField from "@/components/ui/AppTextField";
 
 export default function SignupForm() {
   const theme = useTheme();
@@ -44,7 +44,7 @@ export default function SignupForm() {
 
         if (loginRes?.ok) {
           toast.success("Login successful! Redirecting...");
-          router.push("/dashboard");
+          router.replace(route.dashboard);
         } else {
           toast.error("Signup succeeded but login failed.");
         }
@@ -158,7 +158,7 @@ export default function SignupForm() {
                 cursor: "pointer",
                 fontWeight: 600,
               }}
-              onClick={() => router.replace("/auth/login")}
+              onClick={() => router.replace(route.login)}
             >
               Sign in
             </Box>

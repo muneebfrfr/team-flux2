@@ -8,7 +8,8 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
 
-import ThemeRegistry from "@/components/ThemeRegistry"; // adjust the path if needed
+import ThemeRegistry from "@/components/ThemeRegistry";
+import route from "@/route";
 
 export default function SplashScreen() {
   const router = useRouter();
@@ -19,9 +20,9 @@ export default function SplashScreen() {
 
     const timeout = setTimeout(() => {
       if (status === "authenticated") {
-        router.push("/dashboard");
+        router.push(route.dashboard);
       } else {
-        router.push("/auth/login");
+        router.push(route.login);
       }
     }, 1500);
 
