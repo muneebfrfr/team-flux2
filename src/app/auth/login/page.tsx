@@ -1,5 +1,5 @@
 // /app/auth/login/page.tsx
-import LoginPageClient from "../login/LoginPageClient";
+import LoginPageClient from "@/app/auth/login/LoginPageClient";
 
 export const metadata = {
   title: "Login | Team Flux",

@@ -7,22 +7,22 @@ import axios from "axios";
 
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import CircularProgress from "@mui/material/CircularProgress";
-import InputAdornment from "@mui/material/InputAdornment";
 import useTheme from "@mui/material/styles/useTheme";
 
+import PersonIcon from "@mui/icons-material/Person";
 import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
-import PersonIcon from "@mui/icons-material/Person";
 
 import toast from "react-hot-toast";
+import AppTextField from "@/components/ui/AppTextField"; 
 
 export default function SignupForm() {
   const theme = useTheme();
   const router = useRouter();
+
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
 
@@ -90,56 +90,40 @@ export default function SignupForm() {
           onSubmit={handleSubmit}
           sx={{ mt: 3, display: "flex", flexDirection: "column", gap: 3 }}
         >
-          <TextField
+          <AppTextField
             label="Full Name"
             required
             fullWidth
             value={form.name}
-            disabled={loading}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <PersonIcon
-                    sx={{ color: theme.palette.brand.contrastText }}
-                  />
-                </InputAdornment>
-              ),
-            }}
+            icon={
+              <PersonIcon sx={{ color: theme.palette.brand.contrastText }} />
+            }
+            disabled={loading}
           />
 
-          <TextField
+          <AppTextField
             label="Email"
             type="email"
             required
             fullWidth
             value={form.email}
-            disabled={loading}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <EmailIcon sx={{ color: theme.palette.brand.contrastText }} />
-                </InputAdornment>
-              ),
-            }}
+            icon={
+              <EmailIcon sx={{ color: theme.palette.brand.contrastText }} />
+            }
+            disabled={loading}
           />
 
-          <TextField
+          <AppTextField
             label="Password"
             type="password"
             required
             fullWidth
             value={form.password}
-            disabled={loading}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <LockIcon sx={{ color: theme.palette.brand.contrastText }} />
-                </InputAdornment>
-              ),
-            }}
+            icon={<LockIcon sx={{ color: theme.palette.brand.contrastText }} />}
+            disabled={loading}
           />
 
           <Button

@@ -6,15 +6,15 @@ import { useRouter } from "next/navigation";
 
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import CircularProgress from "@mui/material/CircularProgress";
-import InputAdornment from "@mui/material/InputAdornment";
 import useTheme from "@mui/material/styles/useTheme";
 
 import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
+
+import AppTextField from "@/components/ui/AppTextField";
 
 export default function LoginForm() {
   const theme = useTheme();
@@ -84,36 +84,27 @@ export default function LoginForm() {
           onSubmit={handleLogin}
           sx={{ mt: 3, display: "flex", flexDirection: "column", gap: 3 }}
         >
-          <TextField
-            label="Username"
+          <AppTextField
+            label="Email"
             type="email"
             required
             fullWidth
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <EmailIcon sx={{ color: theme.palette.brand.contrastText }} />
-                </InputAdornment>
-              ),
-            }}
+            icon={
+              <EmailIcon sx={{ color: theme.palette.brand.contrastText }} />
+            }
             disabled={loading}
           />
-          <TextField
+
+          <AppTextField
             label="Password"
             type="password"
             required
             fullWidth
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <LockIcon sx={{ color: theme.palette.brand.contrastText }} />
-                </InputAdornment>
-              ),
-            }}
+            icon={<LockIcon sx={{ color: theme.palette.brand.contrastText }} />}
             disabled={loading}
           />
 
@@ -134,7 +125,7 @@ export default function LoginForm() {
             }}
           >
             {loading ? (
-              <CircularProgress size={24} sx={{ color: "white" }} />
+              <CircularProgress size={24} sx={{ color: "#fff" }} />
             ) : (
               "SIGN IN"
             )}

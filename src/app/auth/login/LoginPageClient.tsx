@@ -1,10 +1,10 @@
 "use client";
 
+import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { Box, CircularProgress } from "@mui/material";
 import LoginForm from "@/components/auth/LoginForm";
+import FullScreenLoader from "@/components/common/FullScreenLoader";
 
 export default function LoginPageClient() {
   const { status } = useSession();
@@ -17,20 +17,7 @@ export default function LoginPageClient() {
   }, [status, router]);
 
   if (status === "loading" || status === "authenticated") {
-    return (
-      <Box
-        sx={{
-          height: "100vh",
-          width: "100vw",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          background: "linear-gradient(to right, #764ba2, #667eea)",
-        }}
-      >
-        <CircularProgress sx={{ color: "#fff" }} />
-      </Box>
-    );
+    return <FullScreenLoader />;
   }
 
   return <LoginForm />;
