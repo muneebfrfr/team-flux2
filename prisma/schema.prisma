@@ -19,6 +19,8 @@ model Users {
   id           String   @id @default(cuid()) @map("_id")
   name         String
   email        String   @unique
+  phoneNumber  String? // New field
+  address      String? // New field
   passwordHash String
   roles        String[] @default([])
   createdAt    DateTime @default(now())
