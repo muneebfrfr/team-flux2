@@ -1,21 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
-import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import useTheme from "@mui/material/styles/useTheme";
 import Grid from "@mui/material/Grid";
+import CircularProgress from "@mui/material/CircularProgress";
+import Alert from "@mui/material/Alert";
+import Typography from "@mui/material/Typography";
+import Divider from "@mui/material/Divider";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import { CircularProgress, Alert } from "@mui/material";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useProfile } from "@/hooks/useProfile";
 import React from "react";
-
+import AppTextField from "@/components/ui/AppTextField";
 export default function ProfilePage() {
   const theme = useTheme();
   const router = useRouter();
@@ -27,6 +27,7 @@ export default function ProfilePage() {
       router.push("/api/auth/signin");
     }
   }, [loading, isAuthenticated, router]);
+
   const [editMode, setEditMode] = useState(false);
   const [form, setForm] = useState({
     name: "",
@@ -35,7 +36,6 @@ export default function ProfilePage() {
     address: "",
   });
 
-  // Update form when profile data is loaded
   useEffect(() => {
     if (profile) {
       setForm({
@@ -86,7 +86,6 @@ export default function ProfilePage() {
       <Box
         sx={{
           backgroundColor: theme.palette.background.default,
-          color: theme.palette.text.primary,
           minHeight: "100vh",
           display: "flex",
           alignItems: "center",
@@ -99,158 +98,179 @@ export default function ProfilePage() {
   }
 
   return (
-    <Box
+    <Paper
+      elevation={10}
       sx={{
-        backgroundColor: theme.palette.background.default,
-        color: theme.palette.text.primary,
-        minHeight: "100vh",
+        borderRadius: 6,
+        p: { xs: 3, md: 6 },
+        height: "90%",
+        backgroundColor: theme.palette.background.paper,
+        mt: 4,
+        maxWidth: 1000,
+        mx: "auto",
       }}
     >
-      <Paper
-        elevation={1}
-        sx={{
-          borderRadius: 4,
-          p: { xs: 3, md: 5 },
-          maxWidth: 900,
-          mx: "auto",
-          mt: 4,
-        }}
-      >
-        {/* Error Alert */}
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
+      {/* Header */}
+      <Box textAlign="center" mb={4}>
+        <Typography variant="h5" fontWeight="bold" gutterBottom>
+          Profile
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Manage your personal information
+        </Typography>
+      </Box>
 
-        {/* Name Field */}
-        <Grid container spacing={2} mb={2}>
-          <Grid item xs={12}>
-            <TextField
+      {error && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          {error}
+        </Alert>
+      )}
+
+      <Divider sx={{ mb: 4 }} />
+
+      <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <Box>
+            <Typography variant="subtitle2" fontWeight={500} mb={0.5}>
+              Full Name:
+            </Typography>
+            <AppTextField
               name="name"
-              label="Full Name"
               value={form.name}
               onChange={handleInputChange}
               disabled={!editMode}
               fullWidth
               InputProps={{
                 sx: {
-                  borderRadius: 5,
-                  backgroundColor: theme.palette.action.hover,
+                  backgroundColor: editMode
+                    ? theme.palette.action.hover
+                    : theme.palette.action.disabled,
                 },
               }}
             />
-          </Grid>
+          </Box>
         </Grid>
 
-        {/* Email Field (Non-editable) */}
-        <Grid container spacing={2} mb={2}>
-          <Grid item xs={12}>
-            <TextField
+        <Grid item xs={12}>
+          <Box>
+            <Typography variant="subtitle2" fontWeight={500} mb={0.5}>
+              Email:
+            </Typography>
+            <AppTextField
               name="email"
-              label="Email"
               value={form.email}
-              disabled={true}
+              disabled
               fullWidth
+              helperText="Email cannot be changed"
               InputProps={{
                 sx: {
-                  borderRadius: 5,
                   backgroundColor: theme.palette.action.disabled,
                 },
               }}
-              helperText="Email cannot be changed"
+              InputLabelProps={{ shrink: true }}
             />
-          </Grid>
+          </Box>
         </Grid>
 
-        {/* Phone Number */}
-        <Box mb={2}>
-          <PhoneInput
-            country={"pk"}
-            value={form.phoneNumber}
-            onChange={handlePhoneChange}
-            disabled={!editMode}
-            inputStyle={{
-              width: "100%",
-              borderRadius: "20px",
-              backgroundColor: editMode
-                ? theme.palette.action.hover
-                : theme.palette.action.disabled,
-              border: `1px solid ${theme.palette.divider}`,
-              paddingLeft: "48px",
-              color: theme.palette.text.primary,
-            }}
-            containerStyle={{
-              width: "100%",
-            }}
-            inputProps={{
-              name: "phoneNumber",
-            }}
-          />
-        </Box>
+        <Grid item xs={12}>
+          <Box>
+            <Typography variant="subtitle2" fontWeight={500} mb={0.5}>
+              Phone Number:
+            </Typography>
+            <PhoneInput
+              country={"pk"}
+              value={form.phoneNumber}
+              onChange={handlePhoneChange}
+              disabled={!editMode}
+              inputStyle={{
+                width: "100%",
+                borderRadius: "12px",
+                backgroundColor: editMode
+                  ? theme.palette.action.hover
+                  : theme.palette.action.disabled,
+                border: `1px solid ${theme.palette.divider}`,
+                paddingLeft: "48px",
+                color: theme.palette.text.primary,
+              }}
+              containerStyle={{
+                width: "100%",
+              }}
+              inputProps={{
+                name: "phoneNumber",
+              }}
+            />
+          </Box>
+        </Grid>
 
-        {/* Address */}
-        <Box>
-          <TextField
-            name="address"
-            label="Address"
-            value={form.address}
-            onChange={handleInputChange}
-            disabled={!editMode}
-            fullWidth
-            multiline
-            rows={2}
-            InputProps={{
-              sx: {
-                borderRadius: 5,
-                backgroundColor: theme.palette.action.hover,
-              },
-            }}
-          />
-        </Box>
+        <Grid item xs={12}>
+          <Box>
+            <Typography variant="subtitle2" fontWeight={500} mb={0.5}>
+              Address:
+            </Typography>
+            <AppTextField
+              name="address"
+              value={form.address}
+              onChange={handleInputChange}
+              disabled={!editMode}
+              fullWidth
+              multiline
+              rows={3}
+              InputProps={{
+                sx: {
+                  backgroundColor: editMode
+                    ? theme.palette.action.hover
+                    : theme.palette.action.disabled,
+                },
+              }}
+              InputLabelProps={{ shrink: true }}
+            />
+          </Box>
+        </Grid>
+      </Grid>
 
-        {/* Buttons */}
-        <Box mt={4} display="flex" justifyContent="flex-end" gap={2}>
-          {!editMode ? (
+      {/* Buttons */}
+      <Box mt={5} display="flex" justifyContent="flex-end" gap={2}>
+        {!editMode ? (
+          <Button
+            variant="contained"
+            onClick={() => setEditMode(true)}
+            sx={{
+              borderRadius: 3,
+              px: 4,
+              py: 1.5,
+            }}
+          >
+            Edit Profile
+          </Button>
+        ) : (
+          <>
             <Button
-              variant="contained"
-              onClick={() => setEditMode(true)}
+              variant="outlined"
+              onClick={handleCancel}
+              disabled={updating}
               sx={{
-                borderRadius: 5,
-                backgroundColor: theme.palette.primary.main,
+                borderRadius: 3,
+                px: 4,
+                py: 1.5,
               }}
             >
-              Edit Profile
+              Cancel
             </Button>
-          ) : (
-            <>
-              <Button
-                variant="outlined"
-                onClick={handleCancel}
-                disabled={updating}
-                sx={{
-                  borderRadius: 5,
-                  borderColor: theme.palette.primary.main,
-                  color: theme.palette.primary.main,
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="contained"
-                onClick={handleSave}
-                disabled={updating}
-                sx={{
-                  borderRadius: 5,
-                  backgroundColor: theme.palette.primary.main,
-                }}
-              >
-                {updating ? <CircularProgress size={24} /> : "Save"}
-              </Button>
-            </>
-          )}
-        </Box>
-      </Paper>
-    </Box>
+            <Button
+              variant="contained"
+              onClick={handleSave}
+              disabled={updating}
+              sx={{
+                borderRadius: 3,
+                px: 4,
+                py: 1.5,
+              }}
+            >
+              {updating ? <CircularProgress size={24} /> : "Save"}
+            </Button>
+          </>
+        )}
+      </Box>
+    </Paper>
   );
 }
