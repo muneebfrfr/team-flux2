@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
@@ -10,17 +10,42 @@ import useTheme from "@mui/material/styles/useTheme";
 import Grid from "@mui/material/Grid";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
+import { CircularProgress, Alert } from "@mui/material";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useProfile } from "@/hooks/useProfile";
+import React from "react";
 
 export default function ProfilePage() {
   const theme = useTheme();
-  const [editMode, setEditMode] = useState(true);
+  const router = useRouter();
+  const { profile, loading, updating, error, updateProfile, isAuthenticated } =
+    useProfile();
+
+  React.useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      router.push("/api/auth/signin");
+    }
+  }, [loading, isAuthenticated, router]);
+  const [editMode, setEditMode] = useState(false);
   const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    phone: "",
-    state: "",
+    name: "",
+    email: "",
+    phoneNumber: "",
     address: "",
   });
+
+  // Update form when profile data is loaded
+  useEffect(() => {
+    if (profile) {
+      setForm({
+        name: profile.name || "",
+        email: profile.email || "",
+        phoneNumber: profile.phoneNumber || "",
+        address: profile.address || "",
+      });
+    }
+  }, [profile]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -28,13 +53,50 @@ export default function ProfilePage() {
   };
 
   const handlePhoneChange = (value: string) => {
-    setForm((prev) => ({ ...prev, phone: value }));
+    setForm((prev) => ({ ...prev, phoneNumber: value }));
   };
 
-  const handleSave = () => {
-    console.log("Saved:", form);
+  const handleSave = async () => {
+    try {
+      await updateProfile({
+        name: form.name,
+        phoneNumber: form.phoneNumber,
+        address: form.address,
+      });
+      setEditMode(false);
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+    }
+  };
+
+  const handleCancel = () => {
+    if (profile) {
+      setForm({
+        name: profile.name || "",
+        email: profile.email || "",
+        phoneNumber: profile.phoneNumber || "",
+        address: profile.address || "",
+      });
+    }
     setEditMode(false);
   };
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          backgroundColor: theme.palette.background.default,
+          color: theme.palette.text.primary,
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -54,37 +116,20 @@ export default function ProfilePage() {
           mt: 4,
         }}
       >
-        {/* Avatar */}
-        <Box display="flex" alignItems="center" mb={4}>
-          <Avatar
-            src="/profile-avatar.png"
-            sx={{ width: 80, height: 80, mr: 2 }}
-          />
-        </Box>
+        {/* Error Alert */}
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
 
-        {/* First Name + Last Name */}
+        {/* Name Field */}
         <Grid container spacing={2} mb={2}>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12}>
             <TextField
-              name="firstName"
-              label="First Name"
-              value={form.firstName}
-              onChange={handleInputChange}
-              disabled={!editMode}
-              fullWidth
-              InputProps={{
-                sx: {
-                  borderRadius: 5,
-                  backgroundColor: theme.palette.action.hover,
-                },
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <TextField
-              name="lastName"
-              label="Last Name"
-              value={form.lastName}
+              name="name"
+              label="Full Name"
+              value={form.name}
               onChange={handleInputChange}
               disabled={!editMode}
               fullWidth
@@ -98,17 +143,39 @@ export default function ProfilePage() {
           </Grid>
         </Grid>
 
+        {/* Email Field (Non-editable) */}
+        <Grid container spacing={2} mb={2}>
+          <Grid item xs={12}>
+            <TextField
+              name="email"
+              label="Email"
+              value={form.email}
+              disabled={true}
+              fullWidth
+              InputProps={{
+                sx: {
+                  borderRadius: 5,
+                  backgroundColor: theme.palette.action.disabled,
+                },
+              }}
+              helperText="Email cannot be changed"
+            />
+          </Grid>
+        </Grid>
+
         {/* Phone Number */}
         <Box mb={2}>
           <PhoneInput
             country={"pk"}
-            value={form.phone}
+            value={form.phoneNumber}
             onChange={handlePhoneChange}
             disabled={!editMode}
             inputStyle={{
               width: "100%",
               borderRadius: "20px",
-              backgroundColor: theme.palette.action.hover,
+              backgroundColor: editMode
+                ? theme.palette.action.hover
+                : theme.palette.action.disabled,
               border: `1px solid ${theme.palette.divider}`,
               paddingLeft: "48px",
               color: theme.palette.text.primary,
@@ -117,25 +184,7 @@ export default function ProfilePage() {
               width: "100%",
             }}
             inputProps={{
-              name: "phone",
-            }}
-          />
-        </Box>
-
-        {/* State */}
-        <Box mb={2}>
-          <TextField
-            name="state"
-            label="State"
-            value={form.state}
-            onChange={handleInputChange}
-            disabled={!editMode}
-            fullWidth
-            InputProps={{
-              sx: {
-                borderRadius: 5,
-                backgroundColor: theme.palette.action.hover,
-              },
+              name: "phoneNumber",
             }}
           />
         </Box>
@@ -168,20 +217,21 @@ export default function ProfilePage() {
               onClick={() => setEditMode(true)}
               sx={{
                 borderRadius: 5,
-                backgroundColor: theme.palette.brand.contrastText,
+                backgroundColor: theme.palette.primary.main,
               }}
             >
-              Edit
+              Edit Profile
             </Button>
           ) : (
             <>
               <Button
                 variant="outlined"
-                onClick={() => setEditMode(false)}
+                onClick={handleCancel}
+                disabled={updating}
                 sx={{
                   borderRadius: 5,
                   borderColor: theme.palette.primary.main,
-                  color: theme.palette.brand.contrastText,
+                  color: theme.palette.primary.main,
                 }}
               >
                 Cancel
@@ -189,12 +239,13 @@ export default function ProfilePage() {
               <Button
                 variant="contained"
                 onClick={handleSave}
+                disabled={updating}
                 sx={{
                   borderRadius: 5,
-                  color: theme.palette.brand.main,
+                  backgroundColor: theme.palette.primary.main,
                 }}
               >
-                Save
+                {updating ? <CircularProgress size={24} /> : "Save"}
               </Button>
             </>
           )}

@@ -13,7 +13,7 @@ import TableRow from "@mui/material/TableRow";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
-import CircularProgress from "@mui/material/CircularProgress"; // 👈 new import
+import CircularProgress from "@mui/material/CircularProgress"; 
 import route from "@/route";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -29,7 +29,7 @@ type Project = {
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [creating, setCreating] = useState(false); // 👈 loader state
+  const [creating, setCreating] = useState(false); 
   const router = useRouter();
 
   const fetchProjects = async () => {
