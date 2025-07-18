@@ -1,8 +1,5 @@
 // This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// Learn more at https://pris.ly/d/prisma-schema
 
 generator client {
   provider        = "prisma-client-js"
@@ -19,8 +16,8 @@ model Users {
   id           String   @id @default(cuid()) @map("_id")
   name         String
   email        String   @unique
-  phoneNumber  String? // New field
-  address      String? // New field
+  phoneNumber  String?
+  address      String?
   passwordHash String
   roles        String[] @default([])
   createdAt    DateTime @default(now())
@@ -41,6 +38,7 @@ model Projects {
 
   // Relations
   technicalDebts TechnicalDebt[]
+  deprecations   Deprecation[]
 }
 
 model TechnicalDebt {
@@ -73,7 +71,24 @@ model Comment {
   user          Users         @relation("CommentUser", fields: [userId], references: [id])
 }
 
-// Enums
+model Deprecation {
+  id                   String   @id @default(cuid()) @map("_id")
+  projectId            String
+  deprecatedItem       String
+  suggestedReplacement String?
+  migrationNotes       String?
+  timelineStart        DateTime
+  deadline             DateTime
+  progressStatus       DeprecationStatus @default(NOT_STARTED)
+  linkedTechnicalDebtIds String[] // Store ObjectId strings manually
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  // Relations
+  project Projects @relation(fields: [projectId], references: [id])
+}
+
+// ENUMS
 enum Priority {
   Low
   Medium
@@ -84,4 +99,10 @@ enum Status {
   open
   in_review
   closed
+}
+
+enum DeprecationStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
 }

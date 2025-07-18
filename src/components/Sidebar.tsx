@@ -95,7 +95,7 @@ export default function Sidebar({ open, width = 240 }: SidebarProps) {
               <ListItemIcon sx={{ color: theme.palette.brand.main }}>
                 <ArticleIcon />
               </ListItemIcon>
-              <ListItemText primary="Technical Debt" />
+              <ListItemText primary="Deprecation Tracker" />
             </ListItemButton>
           </ListItem>
         </List>
