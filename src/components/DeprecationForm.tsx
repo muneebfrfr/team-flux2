@@ -1,17 +1,31 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import axios from "axios";
+
 import AppTextField from "@/components/ui/AppTextField";
 import route from "@/route";
+
+interface DeprecationFormData {
+  id?: string;
+  projectId: string;
+  deprecatedItem: string;
+  suggestedReplacement?: string;
+  migrationNotes?: string;
+  timelineStart: string;
+  deadline: string;
+  progressStatus: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
+}
+
 interface DeprecationFormProps {
-  initialData?: any;
+  initialData?: DeprecationFormData;
   isEdit?: boolean;
 }
 
@@ -20,13 +34,17 @@ interface Project {
   name: string;
 }
 
-const statusOptions = ["NOT_STARTED", "IN_PROGRESS", "COMPLETED"];
+const statusOptions: DeprecationFormData["progressStatus"][] = [
+  "NOT_STARTED",
+  "IN_PROGRESS",
+  "COMPLETED",
+];
 
 export default function DeprecationForm({
   initialData,
   isEdit = false,
 }: DeprecationFormProps) {
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<DeprecationFormData>({
     projectId: "",
     deprecatedItem: "",
     suggestedReplacement: "",
@@ -52,6 +70,7 @@ export default function DeprecationForm({
         progressStatus: statusOptions.includes(initialData.progressStatus)
           ? initialData.progressStatus
           : "NOT_STARTED",
+        id: initialData.id,
       });
     }
   }, [initialData, isEdit]);
@@ -69,8 +88,8 @@ export default function DeprecationForm({
   const handleSubmit = async () => {
     try {
       setLoading(true);
-      if (isEdit && initialData?.id) {
-        await axios.put(`/api/deprecations/${initialData.id}`, form);
+      if (isEdit && form.id) {
+        await axios.put(`/api/deprecations/${form.id}`, form);
       } else {
         await axios.post(`/api/projects/${form.projectId}/deprecations`, form);
       }
@@ -120,7 +139,7 @@ export default function DeprecationForm({
         label="Suggested Replacement"
         fullWidth
         margin="normal"
-        value={form.suggestedReplacement}
+        value={form.suggestedReplacement || ""}
         onChange={handleChange}
       />
 
@@ -131,7 +150,7 @@ export default function DeprecationForm({
         margin="normal"
         multiline
         minRows={3}
-        value={form.migrationNotes}
+        value={form.migrationNotes || ""}
         onChange={handleChange}
       />
 

@@ -2,6 +2,21 @@
 
 import DeprecationForm from "@/components/DeprecationForm";
 
-export default function EditDeprecationClient({ initialData }: { initialData: any }) {
+type DeprecationFormData = {
+  id?: string;
+  projectId: string;
+  deprecatedItem: string;
+  suggestedReplacement?: string;
+  migrationNotes?: string;
+  timelineStart: string;
+  deadline: string;
+  progressStatus: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
+};
+
+export default function EditDeprecationClient({
+  initialData,
+}: {
+  initialData: DeprecationFormData;
+}) {
   return <DeprecationForm isEdit initialData={initialData} />;
 }
