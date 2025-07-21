@@ -92,7 +92,7 @@ export default function ProjectsPage() {
               <TableRow
                 key={project.id}
                 hover
-                onClick={() => router.push(`/projects/${project.id}/debt`)}
+                onClick={() => router.push(`/projects/${project.id}/deprecations`)}
                 style={{ cursor: "pointer" }}
               >
                 <TableCell>{project.name}</TableCell>

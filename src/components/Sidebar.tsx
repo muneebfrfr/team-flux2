@@ -85,7 +85,7 @@ export default function Sidebar({ open, width = 240 }: SidebarProps) {
           <ListItem disablePadding>
             <ListItemButton
               sx={{ color: theme.palette.brand.main }}
-              onClick={() => handleNavigate(route.technicalDebt)}
+              onClick={() => handleNavigate(route.deprecations)}
             >
               <ListItemIcon sx={{ color: theme.palette.brand.main }}>
                 <ArticleIcon />
