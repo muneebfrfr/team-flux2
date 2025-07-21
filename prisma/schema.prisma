@@ -80,7 +80,6 @@ model Deprecation {
   timelineStart        DateTime
   deadline             DateTime
   progressStatus       DeprecationStatus @default(NOT_STARTED)
-  linkedTechnicalDebtIds String[] // Store ObjectId strings manually
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 

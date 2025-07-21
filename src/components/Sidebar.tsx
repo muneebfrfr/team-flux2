@@ -2,7 +2,6 @@
 
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -11,21 +10,17 @@ import ListItemText from "@mui/material/ListItemText";
 import Divider from "@mui/material/Divider";
 import Box from "@mui/material/Box";
 import ListItemButton from "@mui/material/ListItemButton";
-
 import HomeIcon from "@mui/icons-material/Home";
 import LaptopIcon from "@mui/icons-material/Laptop";
 import ArticleIcon from "@mui/icons-material/Article";
-
 import { useTheme } from "@mui/material/styles";
 import route from "@/route";
 import DashboardLoader from "@/components/common/DashboardLoader";
-
 interface SidebarProps {
   open: boolean;
   width?: number;
   onClose: () => void;
 }
-
 export default function Sidebar({ open, width = 240 }: SidebarProps) {
   const theme = useTheme();
   const router = useRouter();
