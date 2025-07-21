@@ -76,6 +76,14 @@ export default async function handler(
       const list = await prisma.deprecation.findMany({
         where: { projectId },
         orderBy: { createdAt: "desc" },
+        include: {
+          project: {
+            select: {
+              name: true,
+              description: true,
+            },
+          },
+        },
       });
 
       return res.status(200).json(list);
