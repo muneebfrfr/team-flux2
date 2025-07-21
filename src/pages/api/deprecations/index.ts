@@ -1,3 +1,57 @@
+/**
+ * @swagger
+ * /api/deprecations:
+ *   get:
+ *     summary: Get all deprecations with associated project info
+ *     tags:
+ *       - Deprecations
+ *     responses:
+ *       200:
+ *         description: Deprecations fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Deprecations fetched successfully
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/DeprecationWithProject'
+ *       500:
+ *         description: Failed to fetch deprecations
+ *
+ *   post:
+ *     summary: Create a new deprecation
+ *     tags:
+ *       - Deprecations
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CreateDeprecationRequest'
+ *     responses:
+ *       201:
+ *         description: Deprecation created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Deprecation created successfully
+ *                 data:
+ *                   $ref: '#/components/schemas/Deprecation'
+ *       400:
+ *         description: Missing required fields
+ *       500:
+ *         description: Failed to create deprecation
+ */
+
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/db";
 

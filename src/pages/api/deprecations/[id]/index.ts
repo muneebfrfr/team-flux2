@@ -1,3 +1,97 @@
+/**
+ * @swagger
+ * /api/deprecations/{id}:
+ *   get:
+ *     summary: Get a single deprecation by ID
+ *     tags:
+ *       - Deprecations
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Deprecation ID
+ *         schema:
+ *           type: string
+ *           example: depr_123
+ *     responses:
+ *       200:
+ *         description: Deprecation fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/DeprecationWithProject'
+ *       400:
+ *         description: Invalid ID format
+ *       404:
+ *         description: Deprecation not found
+ *       500:
+ *         description: Server error
+ *
+ *   put:
+ *     summary: Update a deprecation by ID
+ *     tags:
+ *       - Deprecations
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Deprecation ID
+ *         schema:
+ *           type: string
+ *           example: depr_123
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateDeprecationRequest'
+ *     responses:
+ *       200:
+ *         description: Deprecation updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Deprecation updated successfully
+ *                 data:
+ *                   $ref: '#/components/schemas/Deprecation'
+ *       400:
+ *         description: Invalid ID format
+ *       500:
+ *         description: Failed to update deprecation
+ *
+ *   delete:
+ *     summary: Delete a deprecation by ID
+ *     tags:
+ *       - Deprecations
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Deprecation ID
+ *         schema:
+ *           type: string
+ *           example: depr_123
+ *     responses:
+ *       200:
+ *         description: Deprecation deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Deprecation deleted
+ *       400:
+ *         description: Invalid ID format
+ *       500:
+ *         description: Failed to delete deprecation
+ */
+
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/db";
 
