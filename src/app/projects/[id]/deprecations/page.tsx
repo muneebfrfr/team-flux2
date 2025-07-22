@@ -145,7 +145,6 @@ function DeprecationListTableInner() {
       handleClose();
       fetchDeprecations();
     } catch (err) {
-      // Cast to any to safely get error.response.data.error
       const error = err as { response?: { data?: { error?: string } } };
       setSubmitError(
         error.response?.data?.error || "Failed to create deprecation"
@@ -205,7 +204,6 @@ function DeprecationListTableInner() {
           New Deprecation
         </Button>
       </Box>
-
 
       {deprecations.length === 0 ? (
         <Alert severity="info">No deprecations found for this project.</Alert>

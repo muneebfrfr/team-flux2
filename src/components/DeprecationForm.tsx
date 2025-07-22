@@ -190,11 +190,6 @@ export default function DeprecationForm({
         <MenuItem value="NOT_STARTED">Not Started</MenuItem>
         <MenuItem value="IN_PROGRESS">In Progress</MenuItem>
         <MenuItem value="COMPLETED">Completed</MenuItem>
-        {/* {statusOptions.map((status) => (
-          <MenuItem key={status} value={status}>
-            {status}
-          </MenuItem> */}
-        ))
       </AppTextField>
 
       <Box mt={3}>
