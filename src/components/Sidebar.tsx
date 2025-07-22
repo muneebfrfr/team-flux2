@@ -12,6 +12,7 @@ import Box from "@mui/material/Box";
 import ListItemButton from "@mui/material/ListItemButton";
 import HomeIcon from "@mui/icons-material/Home";
 import LaptopIcon from "@mui/icons-material/Laptop";
+import DataArrayIcon from '@mui/icons-material/DataArray';
 import ArticleIcon from "@mui/icons-material/Article";
 import { useTheme } from "@mui/material/styles";
 import route from "@/route";
@@ -91,6 +92,18 @@ export default function Sidebar({ open, width = 240 }: SidebarProps) {
                 <ArticleIcon />
               </ListItemIcon>
               <ListItemText primary="Deprecation Tracker" />
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem disablePadding>
+            <ListItemButton
+              sx={{ color: theme.palette.brand.main }}
+              onClick={() => handleNavigate(route.technicalDebt)}
+            >
+              <ListItemIcon sx={{ color: theme.palette.brand.main }}>
+                <DataArrayIcon />
+              </ListItemIcon>
+              <ListItemText primary="Technical Debt" />
             </ListItemButton>
           </ListItem>
         </List>

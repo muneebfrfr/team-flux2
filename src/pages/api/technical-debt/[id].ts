@@ -3,7 +3,10 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/db";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   const { id } = req.query;
 
   if (typeof id !== "string") {
@@ -31,7 +34,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       case "PUT": {
-        const { title, description, priority, status, ownerId, dueDate } = req.body;
+        const { title, description, priority, status, ownerId, dueDate } =
+          req.body;
 
         const updated = await prisma.technicalDebt.update({
           where: { id },
@@ -49,7 +53,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       case "DELETE": {
+        await prisma.comment.deleteMany({ where: { technicalDebtId: id } });
         await prisma.technicalDebt.delete({ where: { id } });
+
         return res.status(200).json({ message: "Deleted successfully" });
       }
 
