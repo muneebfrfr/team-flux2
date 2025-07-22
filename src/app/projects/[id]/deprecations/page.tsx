@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -13,7 +14,6 @@ import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 import TableBody from "@mui/material/TableBody";
 import Paper from "@mui/material/Paper";
-import Divider from "@mui/material/Divider";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -206,7 +206,6 @@ function DeprecationListTableInner() {
         </Button>
       </Box>
 
-      <Divider sx={{ mb: 2 }} />
 
       {deprecations.length === 0 ? (
         <Alert severity="info">No deprecations found for this project.</Alert>

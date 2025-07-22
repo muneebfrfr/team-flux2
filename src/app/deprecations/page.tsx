@@ -117,16 +117,18 @@ export default function DeprecationListPage() {
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>Item</TableCell>
-              <TableCell>Replacement</TableCell>
-              <TableCell>Notes</TableCell>
-              <TableCell>Start</TableCell>
-              <TableCell>Deadline</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Project</TableCell>
-              <TableCell>Created</TableCell>
-              <TableCell>Updated</TableCell>
-              <TableCell align="center">Actions</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Item</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Replacement</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Notes</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Start</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Deadline</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Status</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Project</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Created</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Updated</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                Actions
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
