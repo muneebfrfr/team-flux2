@@ -1,13 +1,20 @@
 // app/projects/layout.tsx
+import React from "react";
+import DashboardLayout from "../dashboard/layout.client";
+import ThemeRegistry from "@/components/ThemeRegistry"; // adjust path if needed
 
-import DashboardLayout from '../dashboard/layout.client'; 
 export const metadata = {
   title: "Technical Debt | Team Flux",
 };
+
 export default function ProjectsLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <DashboardLayout>{children}</DashboardLayout>;
+  return (
+    <ThemeRegistry>
+      <DashboardLayout>{children}</DashboardLayout>
+    </ThemeRegistry>
+  );
 }

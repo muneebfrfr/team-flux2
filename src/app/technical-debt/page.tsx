@@ -1,24 +1,25 @@
 "use client";
 
-import {
-  Box,
-  Button,
-  IconButton,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Typography,
-  Chip,
-} from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import Paper from "@mui/material/Paper";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Chip from "@mui/material/Chip";
+import IconButton from "@mui/material/IconButton";
+
+import {
+  Add as AddIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+} from "@mui/icons-material";
 
 interface Project {
   name: string;
@@ -142,7 +143,10 @@ export default function TechnicalDebtPage() {
                       <EditIcon />
                     </IconButton>
                   </Link>
-                  <IconButton color="error" onClick={() => handleDelete(item.id)}>
+                  <IconButton
+                    color="error"
+                    onClick={() => handleDelete(item.id)}
+                  >
                     <DeleteIcon />
                   </IconButton>
                 </TableCell>
