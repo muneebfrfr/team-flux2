@@ -14,12 +14,14 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Chip from "@mui/material/Chip";
 import IconButton from "@mui/material/IconButton";
+import CircularProgress from "@mui/material/CircularProgress";
 import route from "@/route";
 import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
 } from "@mui/icons-material";
+import { useRouter } from "next/navigation";
 
 interface Project {
   name: string;
@@ -41,13 +43,19 @@ interface TechnicalDebtItem {
 
 export default function TechnicalDebtPage() {
   const [debtItems, setDebtItems] = useState<TechnicalDebtItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [editLoadingId, setEditLoadingId] = useState<string | null>(null);
+  const router = useRouter();
 
   const fetchDebt = async () => {
+    setLoading(true);
     try {
       const res = await axios.get("/api/technical-debt");
       setDebtItems(res.data.data);
     } catch (err) {
       console.error("Error fetching technical debt:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -56,6 +64,11 @@ export default function TechnicalDebtPage() {
       await axios.delete(`/api/technical-debt/${id}`);
       fetchDebt();
     }
+  };
+
+  const handleEdit = (id: string) => {
+    setEditLoadingId(id);
+    router.push(route.editTechnicalDebt(id));
   };
 
   useEffect(() => {
@@ -93,8 +106,16 @@ export default function TechnicalDebtPage() {
       <Box display="flex" justifyContent="space-between" mb={3}>
         <Typography variant="h4">Technical Debt Tracker</Typography>
         <Link href={route.newTechnicalDebt}>
-          <Button variant="contained" startIcon={<AddIcon />}>
-            Create New
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            disabled={loading}
+          >
+            {loading ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : (
+              "Create New"
+            )}
           </Button>
         </Link>
       </Box>
@@ -113,45 +134,59 @@ export default function TechnicalDebtPage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {debtItems.map((item) => (
-              <TableRow key={item.id}>
-                <TableCell>{item.title}</TableCell>
-                <TableCell>{item.project?.name}</TableCell>
-                <TableCell>
-                  <Chip
-                    label={item.priority}
-                    color={getPriorityColor(item.priority)}
-                    size="small"
-                  />
-                </TableCell>
-                <TableCell>
-                  <Chip
-                    label={item.status}
-                    color={getStatusColor(item.status)}
-                    size="small"
-                  />
-                </TableCell>
-                <TableCell>{item.owner?.name || "Unassigned"}</TableCell>
-                <TableCell>
-                  {item.dueDate
-                    ? new Date(item.dueDate).toLocaleDateString()
-                    : "-"}
-                </TableCell>
-                <TableCell align="right">
-                  <Link href={route.editTechnicalDebt(item.id)}>
-                    <IconButton color="primary">
-                      <EditIcon />
-                    </IconButton>
-                  </Link>
-                  <IconButton
-                    color="error"
-                    onClick={() => handleDelete(item.id)}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={7} align="center">
+                  <CircularProgress size={24} />
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              debtItems.map((item) => (
+                <TableRow key={item.id}>
+                  <TableCell>{item.title}</TableCell>
+                  <TableCell>{item.project?.name}</TableCell>
+                  <TableCell>
+                    <Chip
+                      label={item.priority}
+                      color={getPriorityColor(item.priority)}
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      label={item.status}
+                      color={getStatusColor(item.status)}
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell>{item.owner?.name || "Unassigned"}</TableCell>
+                  <TableCell>
+                    {item.dueDate
+                      ? new Date(item.dueDate).toLocaleDateString()
+                      : "-"}
+                  </TableCell>
+                  <TableCell align="right">
+                    <IconButton
+                      color="primary"
+                      onClick={() => handleEdit(item.id)}
+                      disabled={editLoadingId === item.id}
+                    >
+                      {editLoadingId === item.id ? (
+                        <CircularProgress size={20} color="inherit" />
+                      ) : (
+                        <EditIcon />
+                      )}
+                    </IconButton>
+                    <IconButton
+                      color="error"
+                      onClick={() => handleDelete(item.id)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </Paper>
