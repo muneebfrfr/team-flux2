@@ -1,7 +1,7 @@
 // app/projects/layout.tsx
 import React from "react";
 import DashboardLayout from "../dashboard/layout.client";
-import ThemeRegistry from "@/components/ThemeRegistry"; // adjust path if needed
+import ThemeRegistry from "@/components/ThemeRegistry"; 
 
 export const metadata = {
   title: "Technical Debt | Team Flux",

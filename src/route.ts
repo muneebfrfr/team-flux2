@@ -9,6 +9,8 @@ const route = {
   projectsNew: "/projects/new",
 
   technicalDebt: "/technical-debt",
+  newTechnicalDebt: "/technical-debt/new",
+  editTechnicalDebt: (id: string) => `/technical-debt/${id}/edit`,
 
   deprecations: "/deprecations",
   deprecationsNew: "/deprecations/new",

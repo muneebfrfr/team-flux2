@@ -14,7 +14,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Chip from "@mui/material/Chip";
 import IconButton from "@mui/material/IconButton";
-
+import route from "@/route";
 import {
   Add as AddIcon,
   Edit as EditIcon,
@@ -92,7 +92,7 @@ export default function TechnicalDebtPage() {
     <Box p={4}>
       <Box display="flex" justifyContent="space-between" mb={3}>
         <Typography variant="h4">Technical Debt Tracker</Typography>
-        <Link href="/technical-debt/new">
+        <Link href={route.newTechnicalDebt}>
           <Button variant="contained" startIcon={<AddIcon />}>
             Create New
           </Button>
@@ -138,7 +138,7 @@ export default function TechnicalDebtPage() {
                     : "-"}
                 </TableCell>
                 <TableCell align="right">
-                  <Link href={`/technical-debt/${item.id}/edit`}>
+                  <Link href={route.editTechnicalDebt(item.id)}>
                     <IconButton color="primary">
                       <EditIcon />
                     </IconButton>
