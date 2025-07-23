@@ -63,7 +63,9 @@ export default async function handler(
     case "GET": {
       try {
         const deprecations = await prisma.deprecation.findMany({
-          include: { project: true },
+          include: {
+            project: true,
+          },
           orderBy: { createdAt: "desc" },
         });
 
@@ -85,6 +87,7 @@ export default async function handler(
         timelineStart,
         deadline,
         progressStatus,
+        linkedTechnicalDebtIds, // 🔧 New field
       } = req.body;
 
       if (!projectId || !deprecatedItem || !progressStatus) {
@@ -100,10 +103,10 @@ export default async function handler(
             deprecatedItem,
             suggestedReplacement,
             migrationNotes,
-            timelineStart: new Date(timelineStart),
+            timelineStart: new Date(timelineStart), 
             deadline: new Date(deadline),
-
             progressStatus,
+            linkedTechnicalDebtIds, // ✅ Save the array directly
           },
         });
 

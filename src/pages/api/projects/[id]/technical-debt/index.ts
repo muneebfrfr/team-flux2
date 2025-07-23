@@ -1,4 +1,5 @@
-// /pages/api/technical-debt/[id]/debt.ts
+// /pages/api/projects/[id]/technica;-debt/index.ts
+// This file handles technical debt items for a specific project
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/db";
 
