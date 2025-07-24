@@ -26,6 +26,39 @@ model Users {
   // Relations
   technicalDebtsOwned TechnicalDebt[] @relation("OwnerRelation")
   comments            Comment[]       @relation("CommentUser")
+  GrowthSession       GrowthSession[]
+}
+
+model GrowthSession {
+  id            String       @id @default(cuid()) @map("_id")
+  topic         String
+  presenterId   String
+  scheduledTime DateTime
+  notes         String?
+  actionItems   ActionItem[]
+  feedback      Feedback[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  // Relations
+  presenter Users @relation(fields: [presenterId], references: [id])
+}
+
+type ActionItem {
+  id          String       @default(cuid()) @map("_id")
+  description String
+  assignedTo  String
+  status      ActionStatus
+  dueDate     DateTime
+
+  // Relation field can be resolved manually in code using assignedTo
+}
+
+type Feedback {
+  userId    String
+  rating    Int
+  comments  String?
+  createdAt DateTime
 }
 
 model Projects {
@@ -90,6 +123,13 @@ model Deprecation {
 }
 
 // ENUMS
+
+enum ActionStatus {
+  open
+  in_progress
+  done
+}
+
 enum Priority {
   Low
   Medium
