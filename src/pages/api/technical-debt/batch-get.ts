@@ -1,4 +1,45 @@
 // /pages/api/technical-debt/batch-get.ts
+/**
+ * @swagger
+ * /api/technical-debt/batch-get:
+ *   post:
+ *     summary: Get multiple technical debt items by IDs
+ *     description: Returns a list of technical debt items based on the provided array of technical debt IDs.
+ *     tags:
+ *       - Technical Debt
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - ids
+ *             properties:
+ *               ids:
+ *                 type: array
+ *                 description: Array of technical debt item IDs
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       200:
+ *         description: List of matched technical debt items
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/TechnicalDebtSummary'
+ *       400:
+ *         description: Invalid or missing `ids` array in request
+ *       405:
+ *         description: Method not allowed
+ *       500:
+ *         description: Internal server error
+ */
 
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/db";

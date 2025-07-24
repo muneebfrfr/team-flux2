@@ -1,4 +1,71 @@
 // /pages/api/technical-debt/[id]/convert-to-deprecation.ts
+/**
+ * @swagger
+ * /api/technical-debt/{id}/convert-to-deprecation:
+ *   post:
+ *     summary: Convert a technical debt item into a deprecation
+ *     description: Creates a new deprecation from a technical debt item and marks the original technical debt as closed.
+ *     tags:
+ *       - Technical Debt
+ *       - Deprecations
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Technical debt item ID to convert
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - deprecatedItem
+ *               - timelineStart
+ *               - deadline
+ *             properties:
+ *               deprecatedItem:
+ *                 type: string
+ *               suggestedReplacement:
+ *                 type: string
+ *               migrationNotes:
+ *                 type: string
+ *               timelineStart:
+ *                 type: string
+ *                 format: date-time
+ *               deadline:
+ *                 type: string
+ *                 format: date-time
+ *               projectId:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Technical debt successfully converted to deprecation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     deprecation:
+ *                       $ref: '#/components/schemas/Deprecation'
+ *                     updatedDebt:
+ *                       $ref: '#/components/schemas/TechnicalDebtWithOwner'
+ *       400:
+ *         description: Missing required fields or invalid input
+ *       404:
+ *         description: Technical debt not found
+ *       409:
+ *         description: Technical debt is already closed
+ *       500:
+ *         description: Internal server error
+ */
 
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/db";

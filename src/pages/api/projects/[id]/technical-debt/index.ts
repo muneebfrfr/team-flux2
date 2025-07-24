@@ -1,5 +1,41 @@
 // /pages/api/projects/[id]/technica;-debt/index.ts
-// This file handles technical debt items for a specific project
+/**
+ * @swagger
+ * /api/projects/{id}/technical-debt:
+ *   get:
+ *     summary: Get technical debt items for a specific project
+ *     description: Fetches all technical debt entries associated with the specified project ID, ordered by creation date (latest first).
+ *     tags:
+ *       - Projects
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Project ID
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Technical debt items fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/TechnicalDebt'
+ *       400:
+ *         description: Invalid project ID
+ *       405:
+ *         description: Method not allowed
+ *       500:
+ *         description: Internal server error
+ */
+
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/db";
 

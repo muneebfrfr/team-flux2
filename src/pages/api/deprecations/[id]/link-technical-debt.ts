@@ -1,5 +1,97 @@
 // /pages/api/deprecations/[id]/link-technical-debt.ts
 
+/**
+ * @swagger
+ * /api/deprecations/{id}/link-technical-debt:
+ *   post:
+ *     summary: Link technical debt items to a deprecation
+ *     description: Appends technical debt IDs to the `linkedTechnicalDebtIds` array in a given deprecation.
+ *     tags:
+ *       - Deprecations
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Deprecation ID
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - technicalDebtIds
+ *             properties:
+ *               technicalDebtIds:
+ *                 type: array
+ *                 description: Array of technical debt item IDs to link
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       200:
+ *         description: Technical debt items linked successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/Deprecation'
+ *       400:
+ *         description: Invalid input
+ *       404:
+ *         description: Deprecation not found
+ *       500:
+ *         description: Server error
+ *
+ *   delete:
+ *     summary: Unlink a technical debt item from a deprecation
+ *     description: Removes a specific technical debt ID from a deprecation's `linkedTechnicalDebtIds`.
+ *     tags:
+ *       - Deprecations
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Deprecation ID
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - technicalDebtId
+ *             properties:
+ *               technicalDebtId:
+ *                 type: string
+ *                 description: The technical debt ID to unlink
+ *     responses:
+ *       200:
+ *         description: Technical debt item unlinked successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/Deprecation'
+ *       400:
+ *         description: Missing technicalDebtId
+ *       404:
+ *         description: Deprecation not found
+ *       500:
+ *         description: Server error
+ */
+
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/db";
 

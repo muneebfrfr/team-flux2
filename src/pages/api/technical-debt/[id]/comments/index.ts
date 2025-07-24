@@ -1,3 +1,74 @@
+/**
+ * @swagger
+ * /api/technical-debt/{id}/comment:
+ *   get:
+ *     summary: Get comments for a specific technical debt
+ *     tags:
+ *       - Comments
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Technical Debt ID
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of comments
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Comment'
+ *       400:
+ *         description: Invalid technical debt ID
+ *       500:
+ *         description: Server error
+ * 
+ *   post:
+ *     summary: Create a new comment for a technical debt item
+ *     tags:
+ *       - Comments
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Technical Debt ID
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - message
+ *               - userId
+ *             properties:
+ *               message:
+ *                 type: string
+ *               userId:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Comment created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   $ref: '#/components/schemas/Comment'
+ *       400:
+ *         description: Missing required fields
+ *       500:
+ *         description: Server error
+ */
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/db";
 
