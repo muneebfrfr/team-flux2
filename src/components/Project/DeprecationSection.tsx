@@ -4,11 +4,6 @@ import {
   Box,
   Typography,
   Button,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
   CircularProgress,
   Dialog,
   DialogTitle,
@@ -119,7 +114,7 @@ export default function DeprecationSection({
                 ...dep,
                 linkedTechnicalDebts: techDebtRes.data.data || [],
               };
-            } catch (error) {
+            } catch {
               console.error(
                 "Failed to fetch linked technical debts for",
                 dep.id
@@ -132,8 +127,8 @@ export default function DeprecationSection({
       );
 
       setDeprecations(enrichedDeprecations);
-    } catch (err) {
-      console.error("Failed to fetch deprecations", err);
+    } catch {
+      console.error("Failed to fetch deprecations");
     } finally {
       setLoading(false);
     }
@@ -145,8 +140,8 @@ export default function DeprecationSection({
       setAvailableTechnicalDebts(
         Array.isArray(res.data.data) ? res.data.data : []
       );
-    } catch (err) {
-      console.error("Failed to fetch technical debts", err);
+    } catch {
+      console.error("Failed to fetch technical debts");
     }
   }, [projectId]);
 
@@ -191,9 +186,9 @@ export default function DeprecationSection({
       }
       setFormOpen(false);
       await fetchDeprecations();
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        setSubmitError(error?.response?.data?.error || "Failed to submit");
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        setSubmitError(err?.response?.data?.error || "Failed to submit");
       } else {
         setSubmitError("Failed to submit");
       }
@@ -207,8 +202,8 @@ export default function DeprecationSection({
       try {
         await axios.delete(`/api/deprecations/${id}`);
         await fetchDeprecations();
-      } catch (error) {
-        console.error("Failed to delete deprecation", error);
+      } catch {
+        console.error("Failed to delete deprecation");
       }
     }
   };
@@ -243,9 +238,9 @@ export default function DeprecationSection({
       setLinkDialogOpen(false);
       setSelectedTechDebtIds([]);
       await fetchDeprecations();
-      await fetchAvailableTechnicalDebts(); // Refresh available debts
-    } catch (error) {
-      console.error("Failed to link technical debts", error);
+      await fetchAvailableTechnicalDebts();
+    } catch {
+      console.error("Failed to link technical debts");
       alert("Failed to link technical debts. Please try again.");
     }
   };
@@ -260,9 +255,9 @@ export default function DeprecationSection({
           }
         );
         await fetchDeprecations();
-        await fetchAvailableTechnicalDebts(); // Refresh available debts
-      } catch (error) {
-        console.error("Failed to unlink technical debt", error);
+        await fetchAvailableTechnicalDebts();
+      } catch {
+        console.error("Failed to unlink technical debt");
         alert("Failed to unlink technical debt. Please try again.");
       }
     }
@@ -314,7 +309,7 @@ export default function DeprecationSection({
                     <Chip
                       label={dep.progressStatus.replace("_", " ")}
                       size="small"
-                      color={getStatusColor(dep.progressStatus) as any}
+                      color={getStatusColor(dep.progressStatus) as "success" | "warning" | "default"}
                     />
                     {dep.linkedTechnicalDebts &&
                       dep.linkedTechnicalDebts.length > 0 && (

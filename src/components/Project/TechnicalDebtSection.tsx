@@ -45,7 +45,6 @@ interface User {
 
 interface Props {
   projectId: string;
-  currentUserId?: string;
 }
 
 const defaultFormData: TechnicalDebt = {
@@ -58,10 +57,7 @@ const defaultFormData: TechnicalDebt = {
   dueDate: "",
 };
 
-export default function TechnicalDebtSection({
-  projectId,
-  currentUserId,
-}: Props) {
+export default function TechnicalDebtSection({ projectId }: Props) {
   const [debts, setDebts] = useState<TechnicalDebt[]>([]);
   const [loading, setLoading] = useState(true);
   const [formOpen, setFormOpen] = useState(false);
@@ -72,7 +68,6 @@ export default function TechnicalDebtSection({
   const [isEditMode, setIsEditMode] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
 
-  // Convert state
   const [selectedDebtForConvert, setSelectedDebtForConvert] =
     useState<TechnicalDebt | null>(null);
   const [convertData, setConvertData] = useState({
@@ -113,7 +108,6 @@ export default function TechnicalDebtSection({
     }
   }, [projectId, fetchTechnicalDebts, fetchUsers]);
 
-  // Form handlers
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -175,11 +169,9 @@ export default function TechnicalDebtSection({
     }
   };
 
-  // Convert handlers
   const handleConvertOpen = (debt: TechnicalDebt) => {
     setSelectedDebtForConvert(debt);
 
-    // Smart pre-filling based on the debt title
     const generateDeprecatedItem = (title: string) => {
       if (
         title.toLowerCase().includes("add") ||
@@ -202,7 +194,7 @@ export default function TechnicalDebtSection({
       timelineStart: new Date().toISOString().split("T")[0],
       deadline: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000)
         .toISOString()
-        .split("T")[0], // 60 days
+        .split("T")[0],
     });
 
     setConvertOpen(true);
@@ -213,7 +205,7 @@ export default function TechnicalDebtSection({
 
     setConverting(true);
     try {
-      const response = await axios.post(
+      await axios.post(
         `/api/technical-debt/${selectedDebtForConvert.id}/convert-to-deprecation`,
         {
           ...convertData,
