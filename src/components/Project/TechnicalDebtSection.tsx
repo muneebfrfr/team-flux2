@@ -17,8 +17,9 @@ import {
   Alert,
   MenuItem,
   IconButton,
+  Chip,
 } from "@mui/material";
-import { Edit, Delete } from "@mui/icons-material";
+import { Edit, Delete, SwapHoriz as ConvertIcon } from "@mui/icons-material";
 import AppTextField from "@/components/ui/AppTextField";
 import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
@@ -44,6 +45,7 @@ interface User {
 
 interface Props {
   projectId: string;
+  currentUserId?: string;
 }
 
 const defaultFormData: TechnicalDebt = {
@@ -56,15 +58,31 @@ const defaultFormData: TechnicalDebt = {
   dueDate: "",
 };
 
-export default function TechnicalDebtSection({ projectId }: Props) {
+export default function TechnicalDebtSection({
+  projectId,
+  currentUserId,
+}: Props) {
   const [debts, setDebts] = useState<TechnicalDebt[]>([]);
   const [loading, setLoading] = useState(true);
   const [formOpen, setFormOpen] = useState(false);
+  const [convertOpen, setConvertOpen] = useState(false);
   const [formData, setFormData] = useState<TechnicalDebt>(defaultFormData);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
+
+  // Convert state
+  const [selectedDebtForConvert, setSelectedDebtForConvert] =
+    useState<TechnicalDebt | null>(null);
+  const [convertData, setConvertData] = useState({
+    deprecatedItem: "",
+    suggestedReplacement: "",
+    migrationNotes: "",
+    timelineStart: "",
+    deadline: "",
+  });
+  const [converting, setConverting] = useState(false);
 
   const fetchTechnicalDebts = useCallback(async () => {
     try {
@@ -77,7 +95,7 @@ export default function TechnicalDebtSection({ projectId }: Props) {
     }
   }, [projectId]);
 
-  const fetchDropdownData = useCallback(async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       const userRes = await axios.get("/api/get-users");
       setUsers(
@@ -91,18 +109,16 @@ export default function TechnicalDebtSection({ projectId }: Props) {
   useEffect(() => {
     if (projectId) {
       fetchTechnicalDebts();
-      fetchDropdownData();
+      fetchUsers();
     }
-  }, [projectId, fetchTechnicalDebts, fetchDropdownData]);
+  }, [projectId, fetchTechnicalDebts, fetchUsers]);
 
+  // Form handlers
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleDialogOpen = (debt?: TechnicalDebt) => {
@@ -125,11 +141,6 @@ export default function TechnicalDebtSection({ projectId }: Props) {
     setFormOpen(true);
   };
 
-  const handleDialogClose = () => {
-    setFormOpen(false);
-    setSubmitError("");
-  };
-
   const handleSubmit = async () => {
     setSubmitting(true);
     setSubmitError("");
@@ -142,7 +153,7 @@ export default function TechnicalDebtSection({ projectId }: Props) {
           projectId,
         });
       }
-      handleDialogClose();
+      setFormOpen(false);
       await fetchTechnicalDebts();
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
@@ -162,6 +173,79 @@ export default function TechnicalDebtSection({ projectId }: Props) {
     } catch (error) {
       console.error("Failed to delete technical debt", error);
     }
+  };
+
+  // Convert handlers
+  const handleConvertOpen = (debt: TechnicalDebt) => {
+    setSelectedDebtForConvert(debt);
+
+    // Smart pre-filling based on the debt title
+    const generateDeprecatedItem = (title: string) => {
+      if (
+        title.toLowerCase().includes("add") ||
+        title.toLowerCase().includes("implement")
+      ) {
+        return title
+          .replace(/add|implement/gi, "Remove old")
+          .replace(/library|framework/gi, "approach");
+      }
+      if (title.toLowerCase().includes("upgrade")) {
+        return title.replace("upgrade", "Remove old version of");
+      }
+      return `Legacy approach replaced by: ${title}`;
+    };
+
+    setConvertData({
+      deprecatedItem: generateDeprecatedItem(debt.title),
+      suggestedReplacement: debt.title,
+      migrationNotes: `Migration from technical debt: ${debt.description}`,
+      timelineStart: new Date().toISOString().split("T")[0],
+      deadline: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split("T")[0], // 60 days
+    });
+
+    setConvertOpen(true);
+  };
+
+  const handleConvertSubmit = async () => {
+    if (!selectedDebtForConvert) return;
+
+    setConverting(true);
+    try {
+      const response = await axios.post(
+        `/api/technical-debt/${selectedDebtForConvert.id}/convert-to-deprecation`,
+        {
+          ...convertData,
+          projectId,
+        }
+      );
+
+      setConvertOpen(false);
+      setSelectedDebtForConvert(null);
+      await fetchTechnicalDebts();
+
+      alert(
+        `Successfully converted technical debt to deprecation!\nDeprecation: "${convertData.deprecatedItem}"`
+      );
+    } catch (error) {
+      console.error("Failed to convert technical debt", error);
+      if (axios.isAxiosError(error)) {
+        alert(
+          `Failed to convert: ${error.response?.data?.error || "Unknown error"}`
+        );
+      } else {
+        alert("Failed to convert technical debt. Please try again.");
+      }
+    } finally {
+      setConverting(false);
+    }
+  };
+
+  const handleConvertChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setConvertData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const formatDate = (str: string) =>
@@ -198,19 +282,67 @@ export default function TechnicalDebtSection({ projectId }: Props) {
             {debts.map((debt) => (
               <TableRow key={debt.id}>
                 <TableCell>{debt.title}</TableCell>
-                <TableCell>{debt.status}</TableCell>
-                <TableCell>{debt.priority}</TableCell>
+                <TableCell>
+                  <Chip
+                    label={debt.status}
+                    size="small"
+                    color={
+                      debt.status === "closed"
+                        ? "success"
+                        : debt.status === "in-review"
+                        ? "warning"
+                        : "default"
+                    }
+                  />
+                </TableCell>
+                <TableCell>
+                  <Chip
+                    label={debt.priority}
+                    size="small"
+                    color={
+                      debt.priority === "High"
+                        ? "error"
+                        : debt.priority === "Medium"
+                        ? "warning"
+                        : "default"
+                    }
+                  />
+                </TableCell>
                 <TableCell>{debt.owner?.name || "—"}</TableCell>
                 <TableCell>{formatDate(debt.dueDate)}</TableCell>
                 <TableCell>
                   <IconButton
                     size="small"
+                    title="Edit"
                     onClick={() => handleDialogOpen(debt)}
                   >
                     <Edit fontSize="small" />
                   </IconButton>
+
+                  {/* Convert Button - Only show for non-closed debts */}
+                  {debt.status !== "closed" && (
+                    <IconButton
+                      size="small"
+                      title="Convert to Deprecation"
+                      onClick={() => handleConvertOpen(debt)}
+                      color="secondary"
+                      sx={{
+                        bgcolor: "secondary.light",
+                        mx: 1,
+                        "&:hover": {
+                          bgcolor: "secondary.main",
+                          color: "white",
+                        },
+                      }}
+                    >
+                      <ConvertIcon fontSize="small" />
+                    </IconButton>
+                  )}
+
                   <IconButton
                     size="small"
+                    title="Delete"
+                    color="error"
                     onClick={() => handleDelete(debt.id)}
                   >
                     <Delete fontSize="small" />
@@ -222,9 +354,10 @@ export default function TechnicalDebtSection({ projectId }: Props) {
         </Table>
       )}
 
+      {/* Technical Debt Form Dialog */}
       <Dialog
         open={formOpen}
-        onClose={handleDialogClose}
+        onClose={() => setFormOpen(false)}
         fullWidth
         maxWidth="sm"
       >
@@ -312,7 +445,7 @@ export default function TechnicalDebtSection({ projectId }: Props) {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDialogClose} disabled={submitting}>
+          <Button onClick={() => setFormOpen(false)} disabled={submitting}>
             Cancel
           </Button>
           <Button
@@ -321,6 +454,101 @@ export default function TechnicalDebtSection({ projectId }: Props) {
             disabled={submitting}
           >
             {submitting ? "Submitting..." : isEditMode ? "Update" : "Create"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Convert to Deprecation Dialog */}
+      <Dialog
+        open={convertOpen}
+        onClose={() => setConvertOpen(false)}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>Convert Technical Debt to Deprecation</DialogTitle>
+        <DialogContent>
+          <Alert severity="info" sx={{ mb: 2 }}>
+            <Typography variant="body2">
+              <strong>Converting:</strong> {selectedDebtForConvert?.title}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              This will create a new deprecation item and mark the technical
+              debt as completed.
+            </Typography>
+          </Alert>
+
+          <AppTextField
+            name="deprecatedItem"
+            label="What is being deprecated?"
+            fullWidth
+            margin="normal"
+            value={convertData.deprecatedItem}
+            onChange={handleConvertChange}
+            required
+            helperText="What old approach/library/method is now deprecated?"
+          />
+
+          <AppTextField
+            name="suggestedReplacement"
+            label="Suggested Replacement"
+            fullWidth
+            margin="normal"
+            value={convertData.suggestedReplacement}
+            onChange={handleConvertChange}
+            helperText="What should be used instead?"
+          />
+
+          <AppTextField
+            name="migrationNotes"
+            label="Migration Notes"
+            fullWidth
+            margin="normal"
+            multiline
+            rows={4}
+            value={convertData.migrationNotes}
+            onChange={handleConvertChange}
+            helperText="Steps or notes for migrating from the deprecated item"
+          />
+
+          <Box display="flex" gap={2}>
+            <AppTextField
+              name="timelineStart"
+              label="Deprecation Start Date"
+              type="date"
+              fullWidth
+              margin="normal"
+              value={convertData.timelineStart}
+              onChange={handleConvertChange}
+              InputLabelProps={{ shrink: true }}
+              required
+              helperText="When does the deprecation period begin?"
+            />
+
+            <AppTextField
+              name="deadline"
+              label="Removal Deadline"
+              type="date"
+              fullWidth
+              margin="normal"
+              value={convertData.deadline}
+              onChange={handleConvertChange}
+              InputLabelProps={{ shrink: true }}
+              required
+              helperText="When must the deprecated item be fully removed?"
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConvertOpen(false)} disabled={converting}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConvertSubmit}
+            variant="contained"
+            disabled={converting}
+            startIcon={<ConvertIcon />}
+          >
+            {converting ? "Converting..." : "Convert to Deprecation"}
           </Button>
         </DialogActions>
       </Dialog>
