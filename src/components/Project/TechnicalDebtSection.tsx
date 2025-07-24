@@ -18,11 +18,35 @@ import {
   MenuItem,
   IconButton,
   Chip,
+  Avatar,
+  TextField,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
 } from "@mui/material";
-import { Edit, Delete, SwapHoriz as ConvertIcon } from "@mui/icons-material";
+import {
+  Edit,
+  Delete,
+  SwapHoriz as ConvertIcon,
+  Comment as CommentIcon,
+} from "@mui/icons-material";
 import AppTextField from "@/components/ui/AppTextField";
 import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
+import { useSession } from "next-auth/react";
+
+interface Comment {
+  id: string;
+  message: string;
+  createdAt: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    image?: string;
+  };
+}
 
 interface TechnicalDebt {
   id: string;
@@ -36,6 +60,7 @@ interface TechnicalDebt {
     id: string;
     name: string;
   };
+  comments?: Comment[];
 }
 
 interface User {
@@ -62,11 +87,16 @@ export default function TechnicalDebtSection({ projectId }: Props) {
   const [loading, setLoading] = useState(true);
   const [formOpen, setFormOpen] = useState(false);
   const [convertOpen, setConvertOpen] = useState(false);
+  const [commentsOpen, setCommentsOpen] = useState(false);
   const [formData, setFormData] = useState<TechnicalDebt>(defaultFormData);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
+  const [selectedDebtId, setSelectedDebtId] = useState("");
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [newComment, setNewComment] = useState("");
+  const { data: session } = useSession();
 
   const [selectedDebtForConvert, setSelectedDebtForConvert] =
     useState<TechnicalDebt | null>(null);
@@ -98,6 +128,15 @@ export default function TechnicalDebtSection({ projectId }: Props) {
       );
     } catch (err) {
       console.error("Failed to fetch users", err);
+    }
+  }, []);
+
+  const fetchComments = useCallback(async (debtId: string) => {
+    try {
+      const res = await axios.get(`/api/comments/${debtId}`);
+      setComments(res.data.data || []);
+    } catch (err) {
+      console.error("Failed to fetch comments", err);
     }
   }, []);
 
@@ -240,8 +279,34 @@ export default function TechnicalDebtSection({ projectId }: Props) {
     setConvertData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const handleCommentsOpen = async (debtId: string) => {
+    setSelectedDebtId(debtId);
+    await fetchComments(debtId);
+    setCommentsOpen(true);
+  };
+
+  const handleCommentSubmit = async () => {
+    if (!newComment.trim() || !session?.user?.id) return;
+
+    try {
+      const res = await axios.post(`/api/technical-debt/${selectedDebtId}/comments`, {
+        message: newComment,
+        userId: session.user.id,
+      });
+
+      setComments((prev) => [...prev, res.data.data]);
+      setNewComment("");
+      await fetchTechnicalDebts(); // Refresh to update comment count
+    } catch (error) {
+      console.error("Failed to post comment", error);
+    }
+  };
+
   const formatDate = (str: string) =>
     str ? new Date(str).toLocaleDateString("en-GB") : "—";
+
+  const formatDateTime = (str: string) =>
+    str ? new Date(str).toLocaleString() : "—";
 
   return (
     <Box mt={4}>
@@ -309,6 +374,38 @@ export default function TechnicalDebtSection({ projectId }: Props) {
                     onClick={() => handleDialogOpen(debt)}
                   >
                     <Edit fontSize="small" />
+                  </IconButton>
+
+                  {/* Comment Button */}
+                  <IconButton
+                    size="small"
+                    title="Comments"
+                    onClick={() => handleCommentsOpen(debt.id)}
+                    color="primary"
+                    sx={{ mx: 1 }}
+                  >
+                    <CommentIcon fontSize="small" />
+                    {debt.comments && debt.comments.length > 0 && (
+                      <Box
+                        component="span"
+                        sx={{
+                          position: "absolute",
+                          top: 0,
+                          right: 0,
+                          bgcolor: "primary.main",
+                          color: "white",
+                          borderRadius: "50%",
+                          width: 16,
+                          height: 16,
+                          fontSize: "0.6rem",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        {debt.comments.length}
+                      </Box>
+                    )}
                   </IconButton>
 
                   {/* Convert Button - Only show for non-closed debts */}
@@ -541,6 +638,80 @@ export default function TechnicalDebtSection({ projectId }: Props) {
             startIcon={<ConvertIcon />}
           >
             {converting ? "Converting..." : "Convert to Deprecation"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Comments Dialog */}
+      <Dialog
+        open={commentsOpen}
+        onClose={() => setCommentsOpen(false)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>Comments</DialogTitle>
+        <DialogContent>
+          <List sx={{ maxHeight: 400, overflow: "auto" }}>
+            {comments.length === 0 ? (
+              <Alert severity="info">No comments yet</Alert>
+            ) : (
+              comments.map((comment) => (
+                <ListItem key={comment.id} alignItems="flex-start">
+                  <ListItemAvatar>
+                    <Avatar src={comment.user.image} alt={comment.user.name} />
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary={comment.user.name}
+                    secondary={
+                      <>
+                        <Typography
+                          component="span"
+                          variant="body2"
+                          color="text.primary"
+                        >
+                          {comment.message}
+                        </Typography>
+                        <Typography
+                          component="div"
+                          variant="caption"
+                          color="text.secondary"
+                        >
+                          {formatDateTime(comment.createdAt)}
+                        </Typography>
+                      </>
+                    }
+                  />
+                </ListItem>
+              ))
+            )}
+          </List>
+
+          {session?.user && (
+            <Box sx={{ mt: 2, display: "flex", gap: 2, alignItems: "center" }}>
+              <Avatar
+                src={session.user.image || undefined}
+                alt={session.user.name || "User"}
+              />
+              <TextField
+                fullWidth
+                multiline
+                rows={2}
+                variant="outlined"
+                placeholder="Add a comment..."
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+              />
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setCommentsOpen(false)}>Close</Button>
+          <Button
+            onClick={handleCommentSubmit}
+            variant="contained"
+            disabled={!newComment.trim()}
+          >
+            Post Comment
           </Button>
         </DialogActions>
       </Dialog>
