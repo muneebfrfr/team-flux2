@@ -1,30 +1,30 @@
 "use client";
 
-import {
-  Box,
-  Typography,
-  Button,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  CircularProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Alert,
-  MenuItem,
-  IconButton,
-  Chip,
-  Avatar,
-  TextField,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-} from "@mui/material";
+import ThemeRegistry from "@/components/ThemeRegistry"; // Adjust path to match your project structure
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import Table from "@mui/material/Table";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import TableCell from "@mui/material/TableCell";
+import TableBody from "@mui/material/TableBody";
+import CircularProgress from "@mui/material/CircularProgress";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import Alert from "@mui/material/Alert";
+import MenuItem from "@mui/material/MenuItem";
+import IconButton from "@mui/material/IconButton";
+import Chip from "@mui/material/Chip";
+import Avatar from "@mui/material/Avatar";
+import TextField from "@mui/material/TextField";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import ListItemText from "@mui/material/ListItemText";
+
 import {
   Edit,
   Delete,
@@ -83,6 +83,14 @@ const defaultFormData: TechnicalDebt = {
 };
 
 export default function TechnicalDebtSection({ projectId }: Props) {
+  return (
+    <ThemeRegistry>
+      <TechnicalDebtContent projectId={projectId} />
+    </ThemeRegistry>
+  );
+}
+
+function TechnicalDebtContent({ projectId }: Props) {
   const [debts, setDebts] = useState<TechnicalDebt[]>([]);
   const [loading, setLoading] = useState(true);
   const [formOpen, setFormOpen] = useState(false);
@@ -289,14 +297,17 @@ export default function TechnicalDebtSection({ projectId }: Props) {
     if (!newComment.trim() || !session?.user?.id) return;
 
     try {
-      const res = await axios.post(`/api/technical-debt/${selectedDebtId}/comments`, {
-        message: newComment,
-        userId: session.user.id,
-      });
+      const res = await axios.post(
+        `/api/technical-debt/${selectedDebtId}/comments`,
+        {
+          message: newComment,
+          userId: session.user.id,
+        }
+      );
 
       setComments((prev) => [...prev, res.data.data]);
       setNewComment("");
-      await fetchTechnicalDebts(); // Refresh to update comment count
+      await fetchTechnicalDebts();
     } catch (error) {
       console.error("Failed to post comment", error);
     }
@@ -376,7 +387,6 @@ export default function TechnicalDebtSection({ projectId }: Props) {
                     <Edit fontSize="small" />
                   </IconButton>
 
-                  {/* Comment Button */}
                   <IconButton
                     size="small"
                     title="Comments"
@@ -408,7 +418,6 @@ export default function TechnicalDebtSection({ projectId }: Props) {
                     )}
                   </IconButton>
 
-                  {/* Convert Button - Only show for non-closed debts */}
                   {debt.status !== "closed" && (
                     <IconButton
                       size="small"
@@ -443,7 +452,6 @@ export default function TechnicalDebtSection({ projectId }: Props) {
         </Table>
       )}
 
-      {/* Technical Debt Form Dialog */}
       <Dialog
         open={formOpen}
         onClose={() => setFormOpen(false)}
@@ -547,7 +555,6 @@ export default function TechnicalDebtSection({ projectId }: Props) {
         </DialogActions>
       </Dialog>
 
-      {/* Convert to Deprecation Dialog */}
       <Dialog
         open={convertOpen}
         onClose={() => setConvertOpen(false)}
@@ -642,7 +649,6 @@ export default function TechnicalDebtSection({ projectId }: Props) {
         </DialogActions>
       </Dialog>
 
-      {/* Comments Dialog */}
       <Dialog
         open={commentsOpen}
         onClose={() => setCommentsOpen(false)}
