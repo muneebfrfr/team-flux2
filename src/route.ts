@@ -15,6 +15,9 @@ const route = {
   deprecations: "/deprecations",
   deprecationsNew: "/deprecations/new",
   deprecationsEdit: (id: string) => `/deprecations/${id}/edit`,
+
+
+    sessions: "/sessions",
 };
 
 export default route;

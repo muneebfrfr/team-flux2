@@ -12,8 +12,9 @@ import Box from "@mui/material/Box";
 import ListItemButton from "@mui/material/ListItemButton";
 import HomeIcon from "@mui/icons-material/Home";
 import LaptopIcon from "@mui/icons-material/Laptop";
-import DataArrayIcon from '@mui/icons-material/DataArray';
+import DataArrayIcon from "@mui/icons-material/DataArray";
 import ArticleIcon from "@mui/icons-material/Article";
+import EventNoteIcon from "@mui/icons-material/EventNote";
 import { useTheme } from "@mui/material/styles";
 import route from "@/route";
 import DashboardLoader from "@/components/common/DashboardLoader";
@@ -68,6 +69,18 @@ export default function Sidebar({ open, width = 240 }: SidebarProps) {
                 <HomeIcon />
               </ListItemIcon>
               <ListItemText primary="Home" />
+            </ListItemButton>
+          </ListItem>
+          {/* sessions */}
+          <ListItem disablePadding>
+            <ListItemButton
+              sx={{ color: theme.palette.brand.main }}
+              onClick={() => handleNavigate(route.sessions)}
+            >
+              <ListItemIcon sx={{ color: theme.palette.brand.main }}>
+                <EventNoteIcon />
+              </ListItemIcon>
+              <ListItemText primary="Sessions" />
             </ListItemButton>
           </ListItem>
 
