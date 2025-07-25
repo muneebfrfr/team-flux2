@@ -21,8 +21,6 @@ export default async function handler(
           where: { id },
           include: { 
             presenter: true,
-            // actionItems are automatically included as they're embedded
-            // feedback is also embedded so it's automatically included
           },
         });
 

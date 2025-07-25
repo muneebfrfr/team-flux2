@@ -1,0 +1,85 @@
+import { NextApiRequest, NextApiResponse } from "next";
+import prisma from "@/lib/db";
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  const {
+    query: { id },
+    method,
+  } = req;
+
+  if (typeof id !== "string") {
+    return res.status(400).json({ message: "Invalid session ID" });
+  }
+
+  try {
+    switch (method) {
+      case "GET": {
+        // Get the notes field from the growth session
+        const session = await prisma.growthSession.findUnique({
+          where: { id },
+          select: {
+            notes: true,
+            actionItems: true // Including actionItems since they might be related
+          }
+        });
+
+        if (!session) {
+          return res.status(404).json({ message: "Session not found" });
+        }
+
+        return res.status(200).json({
+          message: "Notes fetched successfully",
+          data: {
+            notes: session.notes,
+            actionItems: session.actionItems
+          },
+        });
+      }
+
+      case "PUT": {
+        // Update the notes field
+        const { notes, actionItems } = req.body;
+
+        // Validate at least one field is provided
+        if (notes === undefined && actionItems === undefined) {
+          return res.status(400).json({ 
+            message: "Either notes or actionItems must be provided" 
+          });
+        }
+
+        const updatedSession = await prisma.growthSession.update({
+          where: { id },
+          data: {
+            ...(notes !== undefined && { notes }),
+            ...(actionItems !== undefined && { actionItems })
+          },
+          select: {
+            notes: true,
+            actionItems: true
+          }
+        });
+
+        return res.status(200).json({
+          message: "Session notes updated successfully",
+          data: updatedSession,
+        });
+      }
+
+      default: {
+        res.setHeader("Allow", ["GET", "PUT"]);
+        return res.status(405).json({
+          message: `Method ${method} Not Allowed`,
+        });
+      }
+    }
+  } catch (error: any) {
+    console.error("Error processing request:", error);
+    return res.status(500).json({
+      message: "An error occurred while processing the request",
+      error: error.message,
+    });
+  }
+}
