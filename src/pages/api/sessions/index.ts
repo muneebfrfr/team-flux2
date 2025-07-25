@@ -1,0 +1,70 @@
+import { NextApiRequest, NextApiResponse } from "next";
+import prisma from "@/lib/db";
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  if (req.method === "GET") {
+    try {
+      const sessions = await prisma.growthSession.findMany({
+        include: {
+          presenter: true, // Only this is a relation
+        },
+      });
+
+      return res.status(200).json({
+        message: "Growth sessions fetched",
+        data: sessions,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: "Failed to fetch growth sessions",
+        error: error.message,
+      });
+    }
+  }
+
+  if (req.method === "POST") {
+    const {
+      topic,
+      presenterId,
+      scheduledTime,
+      notes,
+      actionItems = [],
+      feedback = [],
+    } = req.body;
+
+    if (!topic || !presenterId || !scheduledTime) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    try {
+      const session = await prisma.growthSession.create({
+        data: {
+          topic,
+          presenterId,
+          scheduledTime: new Date(scheduledTime),
+          notes,
+          actionItems,
+          feedback,
+        },
+        include: {
+          presenter: true,
+        },
+      });
+
+      return res.status(201).json({
+        message: "Growth session created",
+        data: session,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: "Growth session creation failed",
+        error: error.message,
+      });
+    }
+  }
+
+  return res.status(405).json({ message: "Method Not Allowed" });
+}
