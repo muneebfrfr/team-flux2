@@ -1,3 +1,121 @@
+/**
+ * @swagger
+ * /api/growth-sessions/{id}:
+ *   get:
+ *     summary: Get a single growth session by ID
+ *     tags:
+ *       - Growth Sessions
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the growth session
+ *     responses:
+ *       200:
+ *         description: Growth session fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Growth session fetched successfully
+ *                 data:
+ *                   $ref: '#/components/schemas/GrowthSession'
+ *       404:
+ *         description: Growth session not found
+ *       400:
+ *         description: Invalid session ID
+ *       500:
+ *         description: Server error
+ * 
+ *   put:
+ *     summary: Update a growth session by ID
+ *     tags:
+ *       - Growth Sessions
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the growth session
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               topic:
+ *                 type: string
+ *               presenterId:
+ *                 type: string
+ *               scheduledTime:
+ *                 type: string
+ *                 format: date-time
+ *               notes:
+ *                 type: string
+ *               actionItems:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *               feedback:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *     responses:
+ *       200:
+ *         description: Growth session updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Growth session updated successfully
+ *                 data:
+ *                   $ref: '#/components/schemas/GrowthSession'
+ *       400:
+ *         description: Invalid session ID
+ *       500:
+ *         description: Update failed
+ *
+ *   delete:
+ *     summary: Delete a growth session by ID
+ *     tags:
+ *       - Growth Sessions
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the growth session
+ *     responses:
+ *       200:
+ *         description: Growth session deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Growth session deleted successfully
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *       400:
+ *         description: Invalid session ID
+ *       500:
+ *         description: Deletion failed
+ */
+
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/db";
 

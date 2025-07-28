@@ -1,3 +1,101 @@
+/**
+ * @swagger
+ * /api/growth-sessions/{id}/notes:
+ *   get:
+ *     summary: Get notes and action items for a specific growth session
+ *     tags:
+ *       - Growth Sessions
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the growth session
+ *     responses:
+ *       200:
+ *         description: Notes fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Notes fetched successfully
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     notes:
+ *                       type: string
+ *                       nullable: true
+ *                       example: These are the session notes.
+ *                     actionItems:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *       404:
+ *         description: Session not found
+ *       400:
+ *         description: Invalid session ID
+ *       500:
+ *         description: Server error
+ *
+ *   put:
+ *     summary: Update notes and/or action items for a specific growth session
+ *     tags:
+ *       - Growth Sessions
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the growth session
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               notes:
+ *                 type: string
+ *                 example: Updated session notes.
+ *               actionItems:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *             example:
+ *               notes: Updated session notes
+ *               actionItems: []
+ *     responses:
+ *       200:
+ *         description: Session notes updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Session notes updated successfully
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     notes:
+ *                       type: string
+ *                       example: Updated session notes
+ *                     actionItems:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *       400:
+ *         description: Either notes or actionItems must be provided
+ *       500:
+ *         description: Update failed
+ */
+
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/db";
 
