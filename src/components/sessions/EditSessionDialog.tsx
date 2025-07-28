@@ -16,7 +16,7 @@ import MenuItem from "@mui/material/MenuItem";
 import SaveIcon from "@mui/icons-material/Save";
 
 import AppTextField from "@/components/ui/AppTextField";
-import { User, GrowthSession, SessionFormData } from "@/app/sessions/types";
+import { User, GrowthSession, SessionFormData } from "@/app/(authenticated)/sessions/types";
 
 interface EditSessionDialogProps {
   open: boolean;

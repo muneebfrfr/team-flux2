@@ -30,7 +30,7 @@ import {
   ActionItemFormData,
   statusColors,
   statusLabels,
-} from "@/app/sessions/types";
+} from "@/app/(authenticated)/sessions/types";
 
 interface NotesDialogProps {
   open: boolean;

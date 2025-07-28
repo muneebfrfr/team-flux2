@@ -22,11 +22,11 @@ export default function ProfilePage() {
   const { profile, loading, updating, error, updateProfile, isAuthenticated } =
     useProfile();
 
-  React.useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      router.push("/api/auth/signin");
-    }
-  }, [loading, isAuthenticated, router]);
+  // React.useEffect(() => {
+  //   if (!loading && !isAuthenticated) {
+  //     router.push("/api/auth/signin");
+  //   }
+  // }, [loading, isAuthenticated, router]);
 
   const [editMode, setEditMode] = useState(false);
   const [form, setForm] = useState({

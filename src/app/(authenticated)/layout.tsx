@@ -1,28 +1,39 @@
 "use client";
 
-import { useState } from "react";
-import { SessionProvider } from "next-auth/react";
-import { useTheme } from "@mui/material/styles"; 
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
+import FullScreenLoader from "@/components/common/FullScreenLoader";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
-import ThemeRegistry from "@/components/ThemeRegistry"; 
+import ThemeRegistry from "@/components/ThemeRegistry";
+import { authOptions } from "@/lib/auth";
+import { Box, Toolbar } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+import { getServerSession } from "next-auth";
+import { SessionProvider, useSession } from "next-auth/react";
+import { redirect } from "next/navigation";
+import { ReactNode, useState } from "react";
+
+interface Props {
+  children: ReactNode;
+}
 
 const SIDEBAR_WIDTH = 240;
 
-export default function DashboardLayoutClient({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+const AuthenticatedLayout = ({ children }: Props) => {
+  const theme = useTheme();
+  const { data: session, status } = useSession();
+
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const theme = useTheme(); 
 
   const handleToggleSidebar = () => {
     setSidebarOpen((prev) => !prev);
   };
 
+  if (!session && status !== "loading") {
+    redirect("/auth/login");
+  }
+if(status === "loading") {
+    return <FullScreenLoader/>;
+  }
   return (
     <SessionProvider>
       <ThemeRegistry>
@@ -34,7 +45,7 @@ export default function DashboardLayoutClient({
               flexDirection: "column",
               transition: "margin 0.3s ease",
               ml: sidebarOpen ? `${SIDEBAR_WIDTH}px` : 0,
-              bgcolor: theme.palette.background.default, 
+              bgcolor: theme.palette.background.default,
             }}
           >
             <Navbar onToggleSidebar={handleToggleSidebar} />
@@ -59,4 +70,6 @@ export default function DashboardLayoutClient({
       </ThemeRegistry>
     </SessionProvider>
   );
-}
+};
+
+export default AuthenticatedLayout;

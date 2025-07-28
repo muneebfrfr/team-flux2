@@ -18,7 +18,7 @@ import Box from "@mui/material/Box";
 import Rating from "@mui/material/Rating";
 
 import AppTextField from "@/components/ui/AppTextField";
-import { User } from "@/app/sessions/types";
+import { User } from "@/app/(authenticated)/sessions/types";
 
 interface FeedbackDialogProps {
   open: boolean;
