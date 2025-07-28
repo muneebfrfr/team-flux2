@@ -51,7 +51,7 @@ type ActionItem {
   status      ActionStatus
   dueDate     DateTime
 
-  // Relation field can be resolved manually in code using assignedTo
+
 }
 
 type Feedback {
