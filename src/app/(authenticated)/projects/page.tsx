@@ -11,11 +11,11 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  CircularProgress,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
+  TextField,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -25,6 +25,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import AppTextField from "@/components/ui/AppTextField";
 
 type Project = {
   id: string;
@@ -37,9 +38,8 @@ export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [creating, setCreating] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
-    null
-  );
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [confirmInput, setConfirmInput] = useState("");
   const router = useRouter();
 
   const fetchProjects = async () => {
@@ -48,15 +48,17 @@ export default function ProjectsPage() {
   };
 
   const handleDeleteConfirm = async () => {
-    if (!selectedProjectId) return;
-    await axios.delete(`/api/projects/${selectedProjectId}`);
+    if (!selectedProject) return;
+    await axios.delete(`/api/projects/${selectedProject.id}`);
     setDeleteDialogOpen(false);
-    setSelectedProjectId(null);
+    setSelectedProject(null);
+    setConfirmInput("");
     fetchProjects();
   };
 
-  const handleOpenDeleteDialog = (id: string) => {
-    setSelectedProjectId(id);
+  const handleOpenDeleteDialog = (project: Project) => {
+    setSelectedProject(project);
+    setConfirmInput("");
     setDeleteDialogOpen(true);
   };
 
@@ -80,11 +82,11 @@ export default function ProjectsPage() {
         <Typography variant="h4">All Projects</Typography>
         <Button
           variant="contained"
-          startIcon={!creating ? <AddIcon /> : null}
+          startIcon={<AddIcon />}
           onClick={handleCreateProject}
           disabled={creating}
         >
-          {creating ? "Create New Project" : "Create New Project"}
+          Create New Project
         </Button>
       </Box>
 
@@ -133,7 +135,7 @@ export default function ProjectsPage() {
                     color="error"
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleOpenDeleteDialog(project.id);
+                      handleOpenDeleteDialog(project);
                     }}
                   >
                     <DeleteIcon />
@@ -145,18 +147,35 @@ export default function ProjectsPage() {
         </Table>
       </Paper>
 
-      {/* Custom Delete Dialog */}
+      {/* Delete Confirmation Dialog */}
       <Dialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
       >
-        <DialogTitle>Delete Project</DialogTitle>
+        <DialogTitle fontWeight="bold">Delete Project</DialogTitle>
         <DialogContent>
-          <Typography>
-            Are you sure you want to delete this project? This action cannot be
-            undone.
+          <Typography mb={2}>
+            Are you sure you want to delete{" "}
+            <strong>"{selectedProject?.name}"</strong>? <br />
+            <br />
+            <strong>Note:</strong> All related Technical Debts and Deprecations
+            will also be deleted.
           </Typography>
+
+          <Typography variant="body2" gutterBottom>
+            Please type <strong>{selectedProject?.name}</strong> to confirm:
+          </Typography>
+
+          <AppTextField
+            fullWidth
+            variant="outlined"
+            size="small"
+            value={confirmInput}
+            onChange={(e) => setConfirmInput(e.target.value)}
+            placeholder={`Type "${selectedProject?.name}" to confirm`}
+          />
         </DialogContent>
+
         <DialogActions>
           <Button onClick={() => setDeleteDialogOpen(false)} color="inherit">
             Cancel
@@ -165,6 +184,7 @@ export default function ProjectsPage() {
             onClick={handleDeleteConfirm}
             color="error"
             variant="contained"
+            disabled={confirmInput !== selectedProject?.name}
           >
             Delete
           </Button>
