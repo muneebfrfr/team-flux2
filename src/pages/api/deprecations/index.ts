@@ -54,11 +54,14 @@
 
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/db";
+import { requireAuth } from "@/lib/auth/requireAuth";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  const session = await requireAuth(req, res);
+  if (!session) return;
   switch (req.method) {
     case "GET": {
       try {
@@ -103,7 +106,7 @@ export default async function handler(
             deprecatedItem,
             suggestedReplacement,
             migrationNotes,
-            timelineStart: new Date(timelineStart), 
+            timelineStart: new Date(timelineStart),
             deadline: new Date(deadline),
             progressStatus,
             linkedTechnicalDebtIds, // ✅ Save the array directly

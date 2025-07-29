@@ -31,7 +31,7 @@
  *         description: Invalid session ID
  *       500:
  *         description: Server error
- * 
+ *
  *   put:
  *     summary: Update a growth session by ID
  *     tags:
@@ -118,11 +118,14 @@
 
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/db";
+import { requireAuth } from "@/lib/auth/requireAuth";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  const session = await requireAuth(req, res);
+  if (!session) return;
   const {
     query: { id },
     method,
@@ -137,7 +140,7 @@ export default async function handler(
       case "GET": {
         const session = await prisma.growthSession.findUnique({
           where: { id },
-          include: { 
+          include: {
             presenter: true,
           },
         });
@@ -153,7 +156,14 @@ export default async function handler(
       }
 
       case "PUT": {
-        const { topic, presenterId, scheduledTime, notes, actionItems, feedback } = req.body;
+        const {
+          topic,
+          presenterId,
+          scheduledTime,
+          notes,
+          actionItems,
+          feedback,
+        } = req.body;
 
         const updated = await prisma.growthSession.update({
           where: { id },
@@ -164,7 +174,7 @@ export default async function handler(
             notes,
             // For embedded types, you can update them directly
             actionItems: actionItems ? actionItems : undefined,
-            feedback: feedback ? feedback : undefined
+            feedback: feedback ? feedback : undefined,
           },
         });
 

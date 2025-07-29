@@ -1,27 +1,50 @@
-// middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
+// Add your protected routes here
+const protectedRoutes = [
+  "/dashboard",
+  "/sessions",
+  "/technical-debt",
+  "/deprecations",
+  "/projects",
+  "/api/sessions",
+  "/api/technical-debt",
+  "/api/deprecations",
+  "/api/projects",
+  "/api/profile",
+];
+
 export async function middleware(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
-  const isAuthPage =
-    req.nextUrl.pathname === "/auth/login" || req.nextUrl.pathname === "/auth/signup";
+  const { pathname } = req.nextUrl;
 
-  if (!token && !isAuthPage) {
-    return NextResponse.redirect(new URL("/login", req.url));
-  }
+  const isAuthPage = pathname.startsWith("/auth/login") || pathname.startsWith("/auth/signup");
 
-  if (token && isAuthPage) {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
+  const isProtected = protectedRoutes.some((route) => pathname.startsWith(route));
+
+  if (!token && isProtected && !isAuthPage) {
+    const url = req.nextUrl.clone();
+    url.pathname = "/auth/login";
+    return NextResponse.redirect(url);
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-
-  matcher: ["/api/:path*", "/dashboard/:path*", "/sessions/:path*", "/auth/login", "/auth/signup"],
-
+  matcher: [
+    "/dashboard/:path*",
+    "/sessions/:path*",
+    "/technical-debt/:path*",
+    "/deprecations/:path*",
+    "/projects/:path*",
+    "/api/sessions/:path*",
+    "/api/technical-debt/:path*",
+    "/api/deprecations/:path*",
+    "/api/projects/:path*",
+    "/api/profile",
+  ],
 };

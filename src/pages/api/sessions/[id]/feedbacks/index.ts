@@ -92,11 +92,14 @@
 
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/db";
+import { requireAuth } from "@/lib/auth/requireAuth";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  const session = await requireAuth(req, res);
+  if (!session) return;
   const {
     query: { id },
     method,
@@ -111,7 +114,7 @@ export default async function handler(
       case "GET": {
         const session = await prisma.growthSession.findUnique({
           where: { id },
-          select: { feedback: true }
+          select: { feedback: true },
         });
 
         if (!session) {
@@ -141,7 +144,7 @@ export default async function handler(
         // Get existing feedback array
         const session = await prisma.growthSession.findUnique({
           where: { id },
-          select: { feedback: true }
+          select: { feedback: true },
         });
 
         if (!session) {
@@ -153,7 +156,7 @@ export default async function handler(
           userId,
           rating,
           comments: comments || null,
-          createdAt: new Date()
+          createdAt: new Date(),
         };
 
         // Update session with new feedback
@@ -161,10 +164,10 @@ export default async function handler(
           where: { id },
           data: {
             feedback: {
-              set: [...(session.feedback || []), newFeedback]
-            }
+              set: [...(session.feedback || []), newFeedback],
+            },
           },
-          select: { feedback: true }
+          select: { feedback: true },
         });
 
         return res.status(201).json({
@@ -175,14 +178,16 @@ export default async function handler(
 
       default: {
         res.setHeader("Allow", ["GET", "POST"]);
-        return res.status(405).json({ message: `Method ${method} Not Allowed` });
+        return res
+          .status(405)
+          .json({ message: `Method ${method} Not Allowed` });
       }
     }
   } catch (error: any) {
     console.error("Feedback error:", error);
-    return res.status(500).json({ 
-      message: "Server error", 
-      error: error.message 
+    return res.status(500).json({
+      message: "Server error",
+      error: error.message,
     });
   }
 }

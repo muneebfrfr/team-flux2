@@ -60,30 +60,23 @@
  *         description: Internal server error
  */
 
+// pages/api/profile.ts
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/db";
+import { requireAuth } from "@/lib/auth/requireAuth";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  // Get session from NextAuth
-  const session = await getServerSession(req, res, authOptions);
+  // Reuse the session from requireAuth
+  const session = await requireAuth(req, res);
+  if (!session) return; // already handled by requireAuth with 401 response
 
-  if (!session || !session.user) {
-    return res.status(401).json({ error: "Authentication required" });
-  }
-
-  // Handle GET request - fetch profile
   if (req.method === "GET") {
     try {
-      // Get user from database using session
       const user = await prisma.users.findUnique({
-        where: {
-          email: session.user.email, // NextAuth provides email
-        },
+        where: { email: session.user.email! },
         select: {
           id: true,
           name: true,
@@ -102,10 +95,7 @@ export default async function handler(
       console.error("Profile fetch error:", error);
       return res.status(500).json({ error: "Internal server error" });
     }
-  }
-
-  // Handle PUT request - update profile
-  else if (req.method === "PUT") {
+  } else if (req.method === "PUT") {
     try {
       const { name, phoneNumber, address } = req.body;
 
@@ -113,11 +103,8 @@ export default async function handler(
         return res.status(400).json({ error: "Name is required" });
       }
 
-      // Update user profile using session email
       const updatedUser = await prisma.users.update({
-        where: {
-          email: session.user.email,
-        },
+        where: { email: session.user.email! },
         data: {
           name,
           phoneNumber: phoneNumber || null,

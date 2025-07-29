@@ -98,11 +98,14 @@
 
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/db";
+import { requireAuth } from "@/lib/auth/requireAuth";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  const session = await requireAuth(req, res);
+  if (!session) return;
   const {
     query: { id },
     method,
@@ -120,8 +123,8 @@ export default async function handler(
           where: { id },
           select: {
             notes: true,
-            actionItems: true // Including actionItems since they might be related
-          }
+            actionItems: true, // Including actionItems since they might be related
+          },
         });
 
         if (!session) {
@@ -132,7 +135,7 @@ export default async function handler(
           message: "Notes fetched successfully",
           data: {
             notes: session.notes,
-            actionItems: session.actionItems
+            actionItems: session.actionItems,
           },
         });
       }
@@ -143,8 +146,8 @@ export default async function handler(
 
         // Validate at least one field is provided
         if (notes === undefined && actionItems === undefined) {
-          return res.status(400).json({ 
-            message: "Either notes or actionItems must be provided" 
+          return res.status(400).json({
+            message: "Either notes or actionItems must be provided",
           });
         }
 
@@ -152,12 +155,12 @@ export default async function handler(
           where: { id },
           data: {
             ...(notes !== undefined && { notes }),
-            ...(actionItems !== undefined && { actionItems })
+            ...(actionItems !== undefined && { actionItems }),
           },
           select: {
             notes: true,
-            actionItems: true
-          }
+            actionItems: true,
+          },
         });
 
         return res.status(200).json({

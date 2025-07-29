@@ -109,11 +109,14 @@
 
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/db";
+import { requireAuth } from "@/lib/auth/requireAuth";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  const session = await requireAuth(req, res);
+  if (!session) return;
   const { id } = req.query;
 
   if (typeof id !== "string") {

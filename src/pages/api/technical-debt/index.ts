@@ -74,8 +74,15 @@
 
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/db";
+import { requireAuth } from "@/lib/auth/requireAuth";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  const session = await requireAuth(req, res);
+  if (!session) return; // Ends the request if not authenticated
+
   switch (req.method) {
     case "GET": {
       try {
@@ -97,7 +104,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     case "POST": {
-      const { title, description, projectId, ownerId, priority, status, dueDate } = req.body;
+      const {
+        title,
+        description,
+        projectId,
+        ownerId,
+        priority,
+        status,
+        dueDate,
+      } = req.body;
 
       if (!title || !projectId || !ownerId || !priority || !status) {
         return res.status(400).json({ error: "Missing required fields" });

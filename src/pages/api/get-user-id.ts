@@ -54,29 +54,30 @@
 
 import prisma from "@/lib/db";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { requireAuth } from "@/lib/auth/requireAuth";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  const session = await requireAuth(req, res);
+  if (!session) return; 
+
   if (req.method !== "GET") {
     return res.status(405).json({ error: "Only GET method is supported" });
   }
 
   const {
-    query: { name, id },
-    method,
+    query: { id },
   } = req;
-  console.log("id->", id);
+
   if (typeof id !== "string") {
     return res.status(400).json({ error: "Invalid ID" });
   }
 
   try {
     const user = await prisma.users.findUnique({
-      where: {
-        id,
-      },
+      where: { id },
     });
 
     if (!user) {

@@ -12,21 +12,13 @@ import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import { useRouter } from "next/navigation";
 import { useProfile } from "@/hooks/useProfile";
 import React from "react";
 import AppTextField from "@/components/ui/AppTextField";
 export default function ProfilePage() {
   const theme = useTheme();
-  const router = useRouter();
-  const { profile, loading, updating, error, updateProfile, isAuthenticated } =
+  const { profile, loading, updating, error, updateProfile } =
     useProfile();
-
-  // React.useEffect(() => {
-  //   if (!loading && !isAuthenticated) {
-  //     router.push("/api/auth/signin");
-  //   }
-  // }, [loading, isAuthenticated, router]);
 
   const [editMode, setEditMode] = useState(false);
   const [form, setForm] = useState({

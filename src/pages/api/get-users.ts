@@ -37,20 +37,31 @@
  *         description: Internal server error
  */
 
-import prisma from '@/lib/db';
-import type { NextApiRequest, NextApiResponse } from 'next';
+import prisma from "@/lib/db";
+import type { NextApiRequest, NextApiResponse } from "next";
+import { requireAuth } from "@/lib/auth/requireAuth";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Only GET supported' });
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  const session = await requireAuth(req, res);
+  if (!session) return; // Auth failed, response already sent
+
+  if (req.method !== "GET") {
+    return res.status(405).json({ error: "Only GET supported" });
   }
 
   try {
-    const newUser = await prisma.users.findMany();
-
-    return res.status(200).json(newUser);
+    const users = await prisma.users.findMany();
+    return res.status(200).json(users);
   } catch (error) {
-    console.error('Error creating user:', error);
-    return res.status(500).json({ error: 'Failed to create user', message: (error as any).message });
+    console.error("Error fetching users:", error);
+    return res
+      .status(500)
+      .json({
+        error: "Failed to fetch users",
+        message: (error as any).message,
+      });
   }
 }

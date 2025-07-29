@@ -61,8 +61,14 @@
 
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/db";
+import { requireAuth } from "@/lib/auth/requireAuth";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  const session = await requireAuth(req, res);
+  if (!session) return;
   switch (req.method) {
     case "POST": {
       const { name, description, color } = req.body;
@@ -99,7 +105,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     default: {
       res.setHeader("Allow", ["GET", "POST"]);
-      return res.status(405).json({ message: `Method ${req.method} Not Allowed` });
+      return res
+        .status(405)
+        .json({ message: `Method ${req.method} Not Allowed` });
     }
   }
 }
