@@ -107,28 +107,49 @@ export default function CreateProjectPage() {
           {...register("description")}
         />
 
-        <Box sx={{ mb: 2 }}>
-          <Typography variant="body1" gutterBottom>
-            Color
-          </Typography>
+        <Box sx={{ mb: 2, mt: 2 }}>
+
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <IconButton
-              onClick={handleColorPickerOpen}
-              sx={{
-                width: 48,
-                height: 48,
-                backgroundColor: colorValue,
-                border: "1px solid #ccc",
-                "&:hover": {
-                  backgroundColor: colorValue,
-                  opacity: 0.9,
-                },
-              }}
-            >
-              <ColorizeIcon sx={{ color: "white" }} />
-            </IconButton>
-            <Typography variant="body2">{colorValue}</Typography>
+            <Box sx={{ position: "relative", width: 600 }}>
+              <AppTextField
+                label="Color"
+                value={colorValue}
+                disabled
+                fullWidth
+                InputProps={{
+                  startAdornment: (
+                    <Box
+                      sx={{
+                        width: 30,
+                        height: 30,
+                        borderRadius: "4px",
+                        backgroundColor: colorValue,
+                        border: "1px solid #ccc",
+                        mr: 1.5,
+                      }}
+                    />
+                  ),
+                }}
+              />
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: 0,
+                  right: 0,
+                  bottom: 0,
+                  width: 40,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <IconButton onClick={handleColorPickerOpen}>
+                  <ColorizeIcon />
+                </IconButton>
+              </Box>
+            </Box>
           </Box>
+
           {errors.color && (
             <Typography color="error" variant="body2">
               {errors.color.message}
