@@ -18,6 +18,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import MenuIcon from "@mui/icons-material/Menu";
 
 import { useTheme } from "@mui/material/styles";
+import { useRouter } from "next/navigation";
 
 interface NavbarProps {
   onToggleSidebar: () => void;
@@ -26,6 +27,7 @@ interface NavbarProps {
 export default function Navbar({ onToggleSidebar }: NavbarProps) {
   const { data: session } = useSession();
   const theme = useTheme();
+  const router = useRouter();
 
   const [notifAnchorEl, setNotifAnchorEl] = useState<null | HTMLElement>(null);
   const [profileAnchorEl, setProfileAnchorEl] = useState<null | HTMLElement>(
@@ -107,7 +109,7 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
             <DropdownItem
               onClick={() => {
                 handleProfileClose();
-                window.location.href = "/dashboard/profile";
+                router.push("/dashboard/profile");
               }}
             >
               Profile

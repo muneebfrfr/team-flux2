@@ -1,6 +1,5 @@
-// hooks/useProfile.ts - Using NextAuth
-import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+import { useState, useEffect, useCallback } from "react";
+import { useSession } from "next-auth/react";
 
 interface ProfileData {
   id: string;
@@ -23,79 +22,91 @@ export const useProfile = () => {
   const [updating, setUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchProfile = async () => {
+  // Memoized fetch function to prevent unnecessary recreations
+  const fetchProfile = useCallback(async () => {
     try {
+      // Skip if already loading or unauthenticated
+      if (loading || status !== "authenticated") return;
+
       setLoading(true);
       setError(null);
-      
-      // NextAuth automatically handles authentication
-      const response = await fetch('/api/profile', {
-        method: 'GET',
-        credentials: 'include', // Important for NextAuth cookies
+
+      const response = await fetch("/api/profile", {
+        method: "GET",
+        credentials: "include",
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch profile');
+        throw new Error("Failed to fetch profile");
       }
 
       const data = await response.json();
       setProfile(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : "An error occurred");
+      console.error("Profile fetch error:", err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [status, loading]);
 
   const updateProfile = async (profileData: UpdateProfileData) => {
     try {
       setUpdating(true);
       setError(null);
 
-      const response = await fetch('/api/profile', {
-        method: 'PUT',
+      const response = await fetch("/api/profile", {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include', // Important for NextAuth cookies
+        credentials: "include",
         body: JSON.stringify(profileData),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update profile');
+        throw new Error("Failed to update profile");
       }
 
       const updatedProfile = await response.json();
       setProfile(updatedProfile);
       return updatedProfile;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-      throw err;
+      const message = err instanceof Error ? err.message : "An error occurred";
+      setError(message);
+      console.error("Profile update error:", err);
+      throw new Error(message);
     } finally {
       setUpdating(false);
     }
   };
 
   useEffect(() => {
-    // Only fetch when user is authenticated
-    if (status === 'authenticated' && session?.user) {
+    // Only fetch when authenticated and no existing profile data
+    if (status === "authenticated" && !profile) {
       fetchProfile();
-    } else if (status === 'loading') {
-      setLoading(true);
-    } else {
-      setLoading(false);
     }
-  }, [status, session]);
+  }, [status, profile, fetchProfile]);
+
+  // Debugging effect - remove in production
+  useEffect(() => {
+    console.log("Profile state changed:", {
+      loading,
+      updating,
+      profile,
+      error,
+      sessionStatus: status,
+    });
+  }, [loading, updating, profile, error, status]);
 
   return {
     profile,
-    loading: loading || status === 'loading',
+    loading: loading || status === "loading",
     updating,
     error,
     updateProfile,
     refetchProfile: fetchProfile,
-    // NextAuth session data
     session,
-    isAuthenticated: status === 'authenticated',
+    isAuthenticated: status === "authenticated",
   };
 };
