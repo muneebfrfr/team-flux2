@@ -74,7 +74,7 @@ export default async function handler(
       const { name, description, color } = req.body;
 
       if (!name || !color) {
-        return res.status(400).json({ error: "Name and color are required." });
+        return res.status(400).json({ error: "Fill all required fields" });
       }
 
       try {

@@ -15,7 +15,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -151,12 +150,18 @@ export default function ProjectsPage() {
       <Dialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
+        PaperProps={{
+          sx: {
+            borderRadius: 5,
+            padding: 2,
+          },
+        }}
       >
         <DialogTitle fontWeight="bold">Delete Project</DialogTitle>
         <DialogContent>
           <Typography mb={2}>
             Are you sure you want to delete{" "}
-            <strong>"{selectedProject?.name}"</strong>? <br />
+            <strong>&quot;{selectedProject?.name}&quot;</strong>? <br />
             <br />
             <strong>Note:</strong> All related Technical Debts and Deprecations
             will also be deleted.
