@@ -1,19 +1,25 @@
 "use client";
 
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import IconButton from "@mui/material/IconButton";
-import Paper from "@mui/material/Paper";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
+import {
+  Box,
+  Button,
+  Typography,
+  IconButton,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
-import CircularProgress from "@mui/material/CircularProgress"; 
 import route from "@/route";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -29,7 +35,11 @@ type Project = {
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [creating, setCreating] = useState(false); 
+  const [creating, setCreating] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
+    null
+  );
   const router = useRouter();
 
   const fetchProjects = async () => {
@@ -37,14 +47,20 @@ export default function ProjectsPage() {
     setProjects(res.data.data);
   };
 
-  const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this project?")) {
-      await axios.delete(`/api/projects/${id}`);
-      fetchProjects();
-    }
+  const handleDeleteConfirm = async () => {
+    if (!selectedProjectId) return;
+    await axios.delete(`/api/projects/${selectedProjectId}`);
+    setDeleteDialogOpen(false);
+    setSelectedProjectId(null);
+    fetchProjects();
   };
 
-  const handleCreateProject = async () => {
+  const handleOpenDeleteDialog = (id: string) => {
+    setSelectedProjectId(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleCreateProject = () => {
     setCreating(true);
     router.push(route.projectsNew);
   };
@@ -62,18 +78,13 @@ export default function ProjectsPage() {
         mb={3}
       >
         <Typography variant="h4">All Projects</Typography>
-
         <Button
           variant="contained"
           startIcon={!creating ? <AddIcon /> : null}
           onClick={handleCreateProject}
           disabled={creating}
         >
-          {creating ? (
-            <CircularProgress size={20} color="inherit" />
-          ) : (
-            "Create New Project"
-          )}
+          {creating ? "Create New Project" : "Create New Project"}
         </Button>
       </Box>
 
@@ -92,7 +103,6 @@ export default function ProjectsPage() {
               <TableRow
                 key={project.id}
                 hover
-                // onClick={() => router.push(`/projects/${project.id}/deprecations`)}
                 onClick={() => router.push(`/projects/${project.id}`)}
                 style={{ cursor: "pointer" }}
               >
@@ -123,7 +133,7 @@ export default function ProjectsPage() {
                     color="error"
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleDelete(project.id);
+                      handleOpenDeleteDialog(project.id);
                     }}
                   >
                     <DeleteIcon />
@@ -134,6 +144,32 @@ export default function ProjectsPage() {
           </TableBody>
         </Table>
       </Paper>
+
+      {/* Custom Delete Dialog */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
+        <DialogTitle>Delete Project</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete this project? This action cannot be
+            undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)} color="inherit">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleDeleteConfirm}
+            color="error"
+            variant="contained"
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

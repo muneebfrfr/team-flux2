@@ -177,8 +177,24 @@ export default async function handler(
 
       // 🗑️ Delete project
       case "DELETE": {
-        await prisma.projects.delete({
-          where: { id },
+        await prisma.$transaction(async (tx) => {
+          await tx.comment.deleteMany({
+            where: {
+              technicalDebt: {
+                projectId: id,
+              },
+            },
+          });
+          await tx.technicalDebt.deleteMany({
+            where: { projectId: id },
+          });
+
+          await tx.deprecation.deleteMany({
+            where: { projectId: id },
+          });
+          await tx.projects.delete({
+            where: { id },
+          });
         });
 
         return res.status(200).json({
