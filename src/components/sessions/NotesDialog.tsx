@@ -142,8 +142,26 @@ const NotesDialog: React.FC<NotesDialogProps> = ({
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="lg" fullWidth>
-      <DialogTitle>
+   <Dialog
+       open={open}
+       onClose={handleClose}
+       maxWidth="md"
+       PaperProps={{
+         sx: {
+           borderRadius: 5,
+         },
+       }}
+       fullWidth
+     >
+       <DialogTitle
+         sx={{
+           fontWeight: "bold",
+           color: "#fff",
+           backgroundColor: "secondary.main",
+           paddingY: 2,
+           paddingX: 3,
+         }}
+       >
         Manage Notes &amp; Action Items - &quot;{sessionTopic}&quot;
       </DialogTitle>
 
@@ -307,12 +325,13 @@ const NotesDialog: React.FC<NotesDialogProps> = ({
           </Grid>
         </Grid>
       </DialogContent>
-      <DialogActions>
+      <DialogActions  sx={{ paddingRight: 3, paddingBottom: 2 }}>
         <Button onClick={handleClose}>Cancel</Button>
         <Button
           onClick={updateNotes}
           variant="contained"
           startIcon={<SaveIcon />}
+          color="secondary"
         >
           Save Changes
         </Button>

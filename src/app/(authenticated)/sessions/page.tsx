@@ -172,7 +172,7 @@ export default function GrowthSessionsPage() {
         mb={3}
       >
         <Box>
-          <Typography variant="h4" fontWeight="bold" gutterBottom>
+          <Typography variant="h4" fontWeight="bold"  gutterBottom>
             Growth Sessions
           </Typography>
           <Typography variant="subtitle1" color="text.secondary">
@@ -182,8 +182,9 @@ export default function GrowthSessionsPage() {
         </Box>
         <Button
           variant="contained"
-          color="primary"
+          color="secondary"
           size="large"
+          
           startIcon={<AddIcon />}
           onClick={openCreateDialog}
         >

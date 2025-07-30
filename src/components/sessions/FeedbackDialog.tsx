@@ -70,11 +70,31 @@ const FeedbackDialog: React.FC<FeedbackDialogProps> = ({
   };
 
   return (
-    <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>Submit Feedback - &quot;{sessionTopic}&quot;</DialogTitle>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      maxWidth="md"
+      PaperProps={{
+        sx: {
+          borderRadius: 5,
+        },
+      }}
+      fullWidth
+    >
+      <DialogTitle
+        sx={{
+          fontWeight: "bold",
+          color: "#fff",
+          backgroundColor: "secondary.main",
+          paddingY: 2,
+          paddingX: 3,
+        }}
+      >
+        Submit Feedback - &quot;{sessionTopic}&quot;
+      </DialogTitle>
 
       <DialogContent>
-        <Stack spacing={3} sx={{ mt: 1, minWidth: 400 }}>
+        <Stack spacing={3} sx={{ mt: 3, minWidth: 400 }}>
           <FormControl fullWidth required>
             <InputLabel>Your Name</InputLabel>
             <Select
@@ -127,9 +147,9 @@ const FeedbackDialog: React.FC<FeedbackDialogProps> = ({
           />
         </Stack>
       </DialogContent>
-      <DialogActions>
+      <DialogActions sx={{ paddingRight: 3, paddingBottom: 2 }}>
         <Button onClick={handleClose}>Cancel</Button>
-        <Button onClick={submitFeedback} variant="contained">
+        <Button onClick={submitFeedback} variant="contained" color="secondary">
           Submit Feedback
         </Button>
       </DialogActions>

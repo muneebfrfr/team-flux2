@@ -17,7 +17,11 @@ import Typography from "@mui/material/Typography";
 import SaveIcon from "@mui/icons-material/Save";
 
 import AppTextField from "@/components/ui/AppTextField";
-import { User, GrowthSession, SessionFormData } from "@/app/(authenticated)/sessions/types";
+import {
+  User,
+  GrowthSession,
+  SessionFormData,
+} from "@/app/(authenticated)/sessions/types";
 
 interface CreateSessionDialogProps {
   open: boolean;
@@ -90,10 +94,30 @@ const CreateSessionDialog: React.FC<CreateSessionDialogProps> = ({
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-      <DialogTitle>Schedule New Growth Session</DialogTitle>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      maxWidth="md"
+      PaperProps={{
+        sx: {
+          borderRadius: 5,
+        },
+      }}
+      fullWidth
+    >
+      <DialogTitle
+        sx={{
+          fontWeight: "bold",
+          color: "#fff",
+          backgroundColor: "secondary.main",
+          paddingY: 2,
+          paddingX: 3,
+        }}
+      >
+        Schedule New Growth Session
+      </DialogTitle>
       <DialogContent>
-        <Stack spacing={3} sx={{ mt: 1 }}>
+        <Stack spacing={3} sx={{ mt: 3 }}>
           <AppTextField
             label="Session Topic"
             value={formData.topic}
@@ -162,12 +186,13 @@ const CreateSessionDialog: React.FC<CreateSessionDialogProps> = ({
           />
         </Stack>
       </DialogContent>
-      <DialogActions>
+      <DialogActions sx={{ paddingRight: 3, paddingBottom: 2 }}>
         <Button onClick={handleClose}>Cancel</Button>
         <Button
           onClick={createSession}
           variant="contained"
           startIcon={<SaveIcon />}
+          color="secondary"
         >
           Schedule Session
         </Button>

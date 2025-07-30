@@ -36,9 +36,27 @@ const DeleteSessionDialog: React.FC<DeleteSessionDialogProps> = ({
   };
 
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Delete Growth Session</DialogTitle>
-      <DialogContent>
+    <Dialog
+      PaperProps={{
+        sx: {
+          borderRadius: 5,
+        },
+      }}
+      open={open}
+      onClose={onClose}
+    >
+      <DialogTitle
+        sx={{
+          fontWeight: "bold",
+          color: "#fff",
+          backgroundColor: "secondary.main",
+          paddingY: 2,
+          paddingX: 3,
+        }}
+      >
+        Delete Growth Session
+      </DialogTitle>
+      <DialogContent sx={{ mt: 2 }}>
         <Alert severity="warning" sx={{ mb: 2 }}>
           This action cannot be undone.
         </Alert>
@@ -48,7 +66,7 @@ const DeleteSessionDialog: React.FC<DeleteSessionDialogProps> = ({
           action items, and feedback will be permanently removed.
         </Typography>
       </DialogContent>
-      <DialogActions>
+      <DialogActions sx={{ paddingRight: 3, paddingBottom: 2 }}>
         <Button onClick={onClose}>Cancel</Button>
         <Button onClick={deleteSession} color="error" variant="contained">
           Delete Session

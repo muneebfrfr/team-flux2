@@ -16,7 +16,11 @@ import MenuItem from "@mui/material/MenuItem";
 import SaveIcon from "@mui/icons-material/Save";
 
 import AppTextField from "@/components/ui/AppTextField";
-import { User, GrowthSession, SessionFormData } from "@/app/(authenticated)/sessions/types";
+import {
+  User,
+  GrowthSession,
+  SessionFormData,
+} from "@/app/(authenticated)/sessions/types";
 
 interface EditSessionDialogProps {
   open: boolean;
@@ -105,10 +109,31 @@ const EditSessionDialog: React.FC<EditSessionDialogProps> = ({
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-      <DialogTitle>Edit Growth Session</DialogTitle>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      maxWidth="md"
+      PaperProps={{
+        sx: {
+          borderRadius: 5,
+        },
+      }}
+      fullWidth
+    >
+      <DialogTitle
+        sx={{
+          fontWeight: "bold",
+          color: "#fff",
+          backgroundColor: "secondary.main",
+          paddingY: 2,
+          paddingX: 3,
+        }}
+      >
+        {" "}
+        Edit Growth Session
+      </DialogTitle>
       <DialogContent>
-        <Stack spacing={3} sx={{ mt: 1 }}>
+        <Stack spacing={3} sx={{ mt: 3 }}>
           <AppTextField
             label="Session Topic"
             value={formData.topic}
@@ -170,12 +195,13 @@ const EditSessionDialog: React.FC<EditSessionDialogProps> = ({
           />
         </Stack>
       </DialogContent>
-      <DialogActions>
+      <DialogActions sx={{ paddingRight: 3, paddingBottom: 2 }}>
         <Button onClick={handleClose}>Cancel</Button>
         <Button
           onClick={updateSession}
           variant="contained"
           startIcon={<SaveIcon />}
+           color="secondary"
         >
           Update Session
         </Button>
