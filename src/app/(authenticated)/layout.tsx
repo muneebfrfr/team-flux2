@@ -8,13 +8,18 @@ import { ReactNode, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
 import ThemeRegistry from "@/components/ThemeRegistry";
-import { Box, Toolbar } from "@mui/material";
+import { Box, Toolbar, useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
 const SIDEBAR_WIDTH = 240;
 
-export default function AuthenticatedLayout({ children }: { children: ReactNode }) {
+export default function AuthenticatedLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { data: session, status } = useSession();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -32,7 +37,7 @@ export default function AuthenticatedLayout({ children }: { children: ReactNode 
             display: "flex",
             flexDirection: "column",
             transition: "margin 0.3s ease",
-            ml: sidebarOpen ? `${SIDEBAR_WIDTH}px` : "2%",
+            ml: isMobile ? 0 : sidebarOpen ? `${SIDEBAR_WIDTH}px` : "3%",
             bgcolor: theme.palette.background.default,
           }}
         >
