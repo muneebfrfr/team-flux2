@@ -229,13 +229,22 @@ export default function ProjectsPage() {
         PaperProps={{
           sx: {
             borderRadius: 5,
-            padding: 2,
           },
         }}
       >
-        <DialogTitle fontWeight="bold">Delete Project</DialogTitle>
+        <DialogTitle
+          sx={{
+            fontWeight: "bold",
+            color: "#fff",
+            backgroundColor: "secondary.main",
+            paddingY: 2,
+            paddingX: 3,
+          }}
+        >
+          Delete Project
+        </DialogTitle>
         <DialogContent>
-          <Typography mb={2}>
+          <Typography mb={3} mt={3}>
             Are you sure you want to delete{" "}
             <strong>&quot;{selectedProject?.name}&quot;</strong>? <br />
             <br />
@@ -248,6 +257,7 @@ export default function ProjectsPage() {
           </Typography>
 
           <AppTextField
+          sx={{ mt: 3 }}
             fullWidth
             variant="outlined"
             size="small"
@@ -257,7 +267,7 @@ export default function ProjectsPage() {
           />
         </DialogContent>
 
-        <DialogActions>
+        <DialogActions sx={{ paddingRight: 3, paddingBottom: 2 }}>
           <Button onClick={() => setDeleteDialogOpen(false)} color="inherit">
             Cancel
           </Button>

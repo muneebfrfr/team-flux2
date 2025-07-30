@@ -1,11 +1,7 @@
 // components/Project/ProjectFormDialog.tsx
 "use client";
 
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-} from "@mui/material";
+import { Dialog, DialogTitle, DialogContent } from "@mui/material";
 import ProjectForm, { ProjectFormValues } from "./ProjectForm";
 
 interface ProjectFormDialogProps {
@@ -28,7 +24,17 @@ export default function ProjectFormDialog({
   submitButtonText,
 }: ProjectFormDialogProps) {
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      PaperProps={{
+        sx: {
+          borderRadius: 5,
+        },
+      }}
+      fullWidth
+    >
       <DialogTitle
         sx={{
           fontWeight: "bold",
