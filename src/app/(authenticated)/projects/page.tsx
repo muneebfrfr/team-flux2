@@ -19,12 +19,15 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
-import route from "@/route";
+
 import axios from "axios";
 import { useEffect, useState } from "react";
-import Link from "next/link";
+
 import { useRouter } from "next/navigation";
 import AppTextField from "@/components/ui/AppTextField";
+import ProjectFormDialog from "@/components/Project/ProjectFormDialog";
+import { ProjectFormValues } from "@/components/Project/ProjectForm";
+import toast from "react-hot-toast";
 
 type Project = {
   id: string;
@@ -35,24 +38,65 @@ type Project = {
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [creating, setCreating] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [confirmInput, setConfirmInput] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
   const fetchProjects = async () => {
-    const res = await axios.get("/api/projects");
-    setProjects(res.data.data);
+    try {
+      const res = await axios.get("/api/projects");
+      setProjects(res.data.data);
+    } catch {
+      toast.error("Failed to load projects");
+    }
   };
 
   const handleDeleteConfirm = async () => {
     if (!selectedProject) return;
-    await axios.delete(`/api/projects/${selectedProject.id}`);
-    setDeleteDialogOpen(false);
-    setSelectedProject(null);
-    setConfirmInput("");
-    fetchProjects();
+    try {
+      await axios.delete(`/api/projects/${selectedProject.id}`);
+      toast.success("Project deleted successfully");
+      setDeleteDialogOpen(false);
+      setSelectedProject(null);
+      setConfirmInput("");
+      fetchProjects();
+    } catch {
+      toast.error("Failed to delete project");
+    }
+  };
+
+  const handleCreateSubmit = async (data: ProjectFormValues) => {
+    try {
+      setIsSubmitting(true);
+      await axios.post("/api/projects", data);
+      toast.success("Project created successfully");
+      setCreateDialogOpen(false);
+      fetchProjects();
+    } catch {
+      toast.error("Failed to create project");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleEditSubmit = async (data: ProjectFormValues) => {
+    if (!selectedProject) return;
+    try {
+      setIsSubmitting(true);
+      await axios.put(`/api/projects/${selectedProject.id}`, data);
+      toast.success("Project updated successfully");
+      setEditDialogOpen(false);
+      setSelectedProject(null);
+      fetchProjects();
+    } catch {
+      toast.error("Failed to update project");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleOpenDeleteDialog = (project: Project) => {
@@ -61,9 +105,9 @@ export default function ProjectsPage() {
     setDeleteDialogOpen(true);
   };
 
-  const handleCreateProject = () => {
-    setCreating(true);
-    router.push(route.projectsNew);
+  const handleOpenEditDialog = (project: Project) => {
+    setSelectedProject(project);
+    setEditDialogOpen(true);
   };
 
   useEffect(() => {
@@ -78,12 +122,15 @@ export default function ProjectsPage() {
         alignItems="center"
         mb={3}
       >
-        <Typography variant="h4">All Projects</Typography>
+        <Typography variant="h4" fontWeight={600}>
+          All Projects
+        </Typography>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
-          onClick={handleCreateProject}
-          disabled={creating}
+          onClick={() => setCreateDialogOpen(true)}
+          disabled={isSubmitting}
+          color="secondary"
         >
           Create New Project
         </Button>
@@ -93,10 +140,12 @@ export default function ProjectsPage() {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Description</TableCell>
-              <TableCell>Color</TableCell>
-              <TableCell align="right">Actions</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Description</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Color</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }} align="right">
+                Actions
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -122,14 +171,15 @@ export default function ProjectsPage() {
                   )}
                 </TableCell>
                 <TableCell align="right">
-                  <Link
-                    href={`/projects/${project.id}/edit`}
-                    onClick={(e) => e.stopPropagation()}
+                  <IconButton
+                    color="primary"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleOpenEditDialog(project);
+                    }}
                   >
-                    <IconButton color="primary">
-                      <EditIcon />
-                    </IconButton>
-                  </Link>
+                    <EditIcon />
+                  </IconButton>
                   <IconButton
                     color="error"
                     onClick={(e) => {
@@ -145,6 +195,32 @@ export default function ProjectsPage() {
           </TableBody>
         </Table>
       </Paper>
+
+      {/* Create Project Dialog */}
+      <ProjectFormDialog
+        open={createDialogOpen}
+        onClose={() => setCreateDialogOpen(false)}
+        onSubmit={handleCreateSubmit}
+        isSubmitting={isSubmitting}
+        title="Create New Project"
+        submitButtonText="Create"
+      />
+
+      {/* Edit Project Dialog */}
+      {selectedProject && (
+        <ProjectFormDialog
+          open={editDialogOpen}
+          onClose={() => {
+            setEditDialogOpen(false);
+            setSelectedProject(null);
+          }}
+          defaultValues={selectedProject}
+          onSubmit={handleEditSubmit}
+          isSubmitting={isSubmitting}
+          title="Edit Project"
+          submitButtonText="Update"
+        />
+      )}
 
       {/* Delete Confirmation Dialog */}
       <Dialog
