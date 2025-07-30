@@ -76,7 +76,7 @@ export default function ProfilePage() {
     setEditMode(false);
   };
 
-  if (loading) {
+  if (loading || !profile) {
     return (
       <Box
         sx={{
@@ -325,7 +325,9 @@ export default function ProfilePage() {
                   variant="contained"
                   onClick={handleSave}
                   disabled={updating}
-                  startIcon={updating ? <CircularProgress size={20} /> : <SaveIcon />}
+                  startIcon={
+                    updating ? <CircularProgress size={20} /> : <SaveIcon />
+                  }
                   sx={{
                     borderRadius: 2,
                     px: 4,

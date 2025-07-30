@@ -1,3 +1,4 @@
+// hooks/useProfile.ts
 import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 
@@ -18,90 +19,65 @@ interface UpdateProfileData {
 export const useProfile = () => {
   const { data: session, status } = useSession();
   const [profile, setProfile] = useState<ProfileData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Memoized fetch function to prevent unnecessary recreations
   const fetchProfile = useCallback(async () => {
     try {
-      // Skip if already loading or unauthenticated
-      if (loading || status !== "authenticated") return;
-
+      if (status !== "authenticated") return; // Skip if not logged in
       setLoading(true);
       setError(null);
 
-      const response = await fetch("/api/profile", {
+      const res = await fetch("/api/profile", {
         method: "GET",
         credentials: "include",
       });
+      if (!res.ok) throw new Error("Failed to fetch profile");
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch profile");
-      }
-
-      const data = await response.json();
+      const data = await res.json();
       setProfile(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
-      console.error("Profile fetch error:", err);
     } finally {
       setLoading(false);
     }
-  }, [status, loading]);
+  }, [status]);
 
   const updateProfile = async (profileData: UpdateProfileData) => {
     try {
       setUpdating(true);
       setError(null);
 
-      const response = await fetch("/api/profile", {
+      const res = await fetch("/api/profile", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify(profileData),
       });
+      if (!res.ok) throw new Error("Failed to update profile");
 
-      if (!response.ok) {
-        throw new Error("Failed to update profile");
-      }
-
-      const updatedProfile = await response.json();
+      const updatedProfile = await res.json();
       setProfile(updatedProfile);
       return updatedProfile;
     } catch (err) {
-      const message = err instanceof Error ? err.message : "An error occurred";
-      setError(message);
-      console.error("Profile update error:", err);
-      throw new Error(message);
+      setError(err instanceof Error ? err.message : "An error occurred");
+      throw err;
     } finally {
       setUpdating(false);
     }
   };
 
+  // Fetch profile exactly once after auth is confirmed
   useEffect(() => {
-    // Only fetch when authenticated and no existing profile data
-    if (status === "authenticated" && !profile) {
+    if (status === "authenticated" && profile === null) {
       fetchProfile();
     }
   }, [status, profile, fetchProfile]);
 
-  // Debugging effect - remove in production
-  useEffect(() => {
-    console.log("Profile state changed:", {
-      loading,
-      updating,
-      profile,
-      error,
-      sessionStatus: status,
-    });
-  }, [loading, updating, profile, error, status]);
-
   return {
     profile,
-    loading: loading || status === "loading",
+    loading: status === "loading" || loading,
     updating,
     error,
     updateProfile,
@@ -110,3 +86,4 @@ export const useProfile = () => {
     isAuthenticated: status === "authenticated",
   };
 };
+
