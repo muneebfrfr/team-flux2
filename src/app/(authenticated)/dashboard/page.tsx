@@ -1,14 +1,15 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { Typography, Box } from "@mui/material";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-semibold">
+    <Box sx={{ p: 6 }}>
+      <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom>
         Welcome, {session?.user?.name ?? "Guest"}
-      </h1>
-    </div>
+      </Typography>
+    </Box>
   );
 }

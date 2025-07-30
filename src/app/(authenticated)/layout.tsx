@@ -16,7 +16,7 @@ const SIDEBAR_WIDTH = 240;
 export default function AuthenticatedLayout({ children }: { children: ReactNode }) {
   const theme = useTheme();
   const { data: session, status } = useSession();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   if (status === "loading") return <FullScreenLoader />;
   if (!session) redirect("/auth/login");
@@ -32,7 +32,7 @@ export default function AuthenticatedLayout({ children }: { children: ReactNode 
             display: "flex",
             flexDirection: "column",
             transition: "margin 0.3s ease",
-            ml: sidebarOpen ? `${SIDEBAR_WIDTH}px` : 0,
+            ml: sidebarOpen ? `${SIDEBAR_WIDTH}px` : "2%",
             bgcolor: theme.palette.background.default,
           }}
         >

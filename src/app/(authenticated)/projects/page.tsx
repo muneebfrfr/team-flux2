@@ -15,14 +15,19 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  useMediaQuery,
+  Card,
+  CardContent,
+  CardActions,
+  Divider,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
+import { useTheme } from "@mui/material/styles";
 
 import axios from "axios";
 import { useEffect, useState } from "react";
-
 import { useRouter } from "next/navigation";
 import AppTextField from "@/components/ui/AppTextField";
 import ProjectFormDialog from "@/components/Project/ProjectFormDialog";
@@ -45,6 +50,8 @@ export default function ProjectsPage() {
   const [confirmInput, setConfirmInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // Detect mobile
 
   const fetchProjects = async () => {
     try {
@@ -115,14 +122,21 @@ export default function ProjectsPage() {
   }, []);
 
   return (
-    <Box p={4}>
+    <Box p={{ xs: 2, sm: 4 }}>
+      {/* Header */}
       <Box
         display="flex"
+        flexDirection={{ xs: "column", sm: "row" }}
         justifyContent="space-between"
-        alignItems="center"
+        alignItems={{ xs: "stretch", sm: "center" }}
+        gap={2}
         mb={3}
       >
-        <Typography variant="h4" fontWeight={600}>
+        <Typography
+          variant="h4"
+          fontWeight={600}
+          textAlign={{ xs: "center", sm: "left" }}
+        >
           All Projects
         </Typography>
         <Button
@@ -131,70 +145,124 @@ export default function ProjectsPage() {
           onClick={() => setCreateDialogOpen(true)}
           disabled={isSubmitting}
           color="secondary"
+          fullWidth={isMobile}
         >
           Create New Project
         </Button>
       </Box>
 
-      <Paper>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Description</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Color</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }} align="right">
-                Actions
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {projects.map((project) => (
-              <TableRow
-                key={project.id}
-                hover
-                onClick={() => router.push(`/projects/${project.id}`)}
-                style={{ cursor: "pointer" }}
-              >
-                <TableCell>{project.name}</TableCell>
-                <TableCell>{project.description}</TableCell>
-                <TableCell>
-                  {project.color && (
-                    <Box
-                      sx={{
-                        width: 20,
-                        height: 20,
-                        borderRadius: "50%",
-                        backgroundColor: project.color,
-                      }}
-                    />
-                  )}
-                </TableCell>
-                <TableCell align="right">
-                  <IconButton
-                    color="primary"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleOpenEditDialog(project);
+      {/* Table or Card Layout */}
+      {isMobile ? (
+        // Mobile: Card View
+        <Box display="flex" flexDirection="column" gap={2}>
+          {projects.map((project) => (
+            <Card
+              key={project.id}
+              onClick={() => router.push(`/projects/${project.id}`)}
+              sx={{ cursor: "pointer" }}
+            >
+              <CardContent>
+                <Typography variant="h6">{project.name}</Typography>
+                <Typography variant="body2" color="text.secondary" mb={1}>
+                  {project.description}
+                </Typography>
+                {project.color && (
+                  <Box
+                    sx={{
+                      width: 20,
+                      height: 20,
+                      borderRadius: "50%",
+                      backgroundColor: project.color,
                     }}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton
-                    color="error"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleOpenDeleteDialog(project);
-                    }}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
+                  />
+                )}
+              </CardContent>
+              <Divider />
+              <CardActions>
+                <IconButton
+                  color="primary"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenEditDialog(project);
+                  }}
+                >
+                  <EditIcon />
+                </IconButton>
+                <IconButton
+                  color="error"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenDeleteDialog(project);
+                  }}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </CardActions>
+            </Card>
+          ))}
+        </Box>
+      ) : (
+        // Desktop: Table View
+        <Paper>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Description</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Color</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }} align="right">
+                  Actions
                 </TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Paper>
+            </TableHead>
+            <TableBody>
+              {projects.map((project) => (
+                <TableRow
+                  key={project.id}
+                  hover
+                  onClick={() => router.push(`/projects/${project.id}`)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <TableCell>{project.name}</TableCell>
+                  <TableCell>{project.description}</TableCell>
+                  <TableCell>
+                    {project.color && (
+                      <Box
+                        sx={{
+                          width: 20,
+                          height: 20,
+                          borderRadius: "50%",
+                          backgroundColor: project.color,
+                        }}
+                      />
+                    )}
+                  </TableCell>
+                  <TableCell align="right">
+                    <IconButton
+                      color="primary"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpenEditDialog(project);
+                      }}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton
+                      color="error"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpenDeleteDialog(project);
+                      }}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Paper>
+      )}
 
       {/* Create Project Dialog */}
       <ProjectFormDialog
@@ -226,9 +294,10 @@ export default function ProjectsPage() {
       <Dialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
+        fullScreen={isMobile} // Fullscreen dialog on mobile
         PaperProps={{
           sx: {
-            borderRadius: 5,
+            borderRadius: isMobile ? 0 : 5,
           },
         }}
       >
@@ -257,7 +326,7 @@ export default function ProjectsPage() {
           </Typography>
 
           <AppTextField
-          sx={{ mt: 3 }}
+            sx={{ mt: 3 }}
             fullWidth
             variant="outlined"
             size="small"

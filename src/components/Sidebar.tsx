@@ -16,24 +16,34 @@ import DataArrayIcon from "@mui/icons-material/DataArray";
 import ArticleIcon from "@mui/icons-material/Article";
 import EventNoteIcon from "@mui/icons-material/EventNote";
 import { useTheme } from "@mui/material/styles";
+import { useMediaQuery } from "@mui/material";
 import route from "@/route";
 import DashboardLoader from "@/components/common/DashboardLoader";
+
 interface SidebarProps {
-  open: boolean;
+  open?: boolean;
   width?: number;
   onClose: () => void;
 }
-export default function Sidebar({ open, width = 240 }: SidebarProps) {
+
+const COLLAPSED_WIDTH = 60;
+
+export default function Sidebar({ open=false, width = 240, onClose }: SidebarProps) {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const router = useRouter();
   const pathname = usePathname();
 
   const [loading, setLoading] = useState(false);
 
   const handleNavigate = (path: string) => {
-    if (path === pathname) return;
+    if (path === pathname) {
+      if (isMobile) onClose();
+      return;
+    }
     setLoading(true);
     router.push(path);
+    if (isMobile) onClose();
   };
 
   useEffect(() => {
@@ -43,82 +53,67 @@ export default function Sidebar({ open, width = 240 }: SidebarProps) {
   return (
     <>
       <Drawer
-        variant="persistent"
+        variant={isMobile ? "temporary" : "permanent"}
         anchor="left"
         open={open}
+        onClose={onClose}
+        ModalProps={{
+          keepMounted: true,
+        }}
         sx={{
-          width,
+          width: open || isMobile ? width : COLLAPSED_WIDTH,
           flexShrink: 0,
           "& .MuiDrawer-paper": {
-            width,
+            width: open || isMobile ? width : COLLAPSED_WIDTH,
+            transition: "width 0.3s ease",
+            overflowX: "hidden",
             boxSizing: "border-box",
             background: `linear-gradient(to bottom, ${theme.palette.secondary.main}, ${theme.palette.primary.main})`,
             color: theme.palette.brand.contrastText,
           },
         }}
       >
-        <Box p={4}></Box>
-        <Divider sx={{ borderColor: "rgba(255,255,255,0.2)" }} />
+        <Box p={open ? 4 : 4} />
         <List>
-          <ListItem disablePadding>
-            <ListItemButton
-              sx={{ color: theme.palette.brand.main }}
-              onClick={() => handleNavigate(route.dashboard)}
-            >
-              <ListItemIcon sx={{ color: theme.palette.brand.main }}>
-                <HomeIcon />
-              </ListItemIcon>
-              <ListItemText primary="Home" />
-            </ListItemButton>
-          </ListItem>
-          {/* sessions */}
-          <ListItem disablePadding>
-            <ListItemButton
-              sx={{ color: theme.palette.brand.main }}
-              onClick={() => handleNavigate(route.sessions)}
-            >
-              <ListItemIcon sx={{ color: theme.palette.brand.main }}>
-                <EventNoteIcon />
-              </ListItemIcon>
-              <ListItemText primary="Sessions" />
-            </ListItemButton>
-          </ListItem>
-
-          <ListItem disablePadding>
-            <ListItemButton
-              sx={{ color: theme.palette.brand.main }}
-              onClick={() => handleNavigate(route.projects)}
-            >
-              <ListItemIcon sx={{ color: theme.palette.brand.main }}>
-                <LaptopIcon />
-              </ListItemIcon>
-              <ListItemText primary="Projects" />
-            </ListItemButton>
-          </ListItem>
-
-          <ListItem disablePadding>
-            <ListItemButton
-              sx={{ color: theme.palette.brand.main }}
-              onClick={() => handleNavigate(route.deprecations)}
-            >
-              <ListItemIcon sx={{ color: theme.palette.brand.main }}>
-                <ArticleIcon />
-              </ListItemIcon>
-              <ListItemText primary="Deprecation Tracker" />
-            </ListItemButton>
-          </ListItem>
-
-          <ListItem disablePadding>
-            <ListItemButton
-              sx={{ color: theme.palette.brand.main }}
-              onClick={() => handleNavigate(route.technicalDebt)}
-            >
-              <ListItemIcon sx={{ color: theme.palette.brand.main }}>
-                <DataArrayIcon />
-              </ListItemIcon>
-              <ListItemText primary="Technical Debt" />
-            </ListItemButton>
-          </ListItem>
+          {[
+            { text: "Home", icon: <HomeIcon />, path: route.dashboard },
+            { text: "Sessions", icon: <EventNoteIcon />, path: route.sessions },
+            { text: "Projects", icon: <LaptopIcon />, path: route.projects },
+            {
+              text: "Deprecation Tracker",
+              icon: <ArticleIcon />,
+              path: route.deprecations,
+            },
+            {
+              text: "Technical Debt",
+              icon: <DataArrayIcon />,
+              path: route.technicalDebt,
+            },
+          ].map((item) => (
+            <ListItem key={item.text} disablePadding sx={{ display: "block" }}>
+              <ListItemButton
+                onClick={() => handleNavigate(item.path)}
+                sx={{
+                  color: theme.palette.brand.main,
+                  minHeight: 48,
+                  justifyContent: open || isMobile ? "initial" : "center",
+                  px: 2.5,
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    color: theme.palette.brand.main,
+                    minWidth: 0,
+                    mr: open || isMobile ? 3 : "auto",
+                    justifyContent: "center",
+                  }}
+                >
+                  {item.icon}
+                </ListItemIcon>
+                {(open || isMobile) && <ListItemText primary={item.text} />}
+              </ListItemButton>
+            </ListItem>
+          ))}
         </List>
       </Drawer>
 
