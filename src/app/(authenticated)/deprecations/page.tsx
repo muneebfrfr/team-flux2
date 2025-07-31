@@ -10,6 +10,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import route from "@/route";
 import DataTablePage from "@/components/common/DataTablePage";
+import { Typography } from "@mui/material";
 
 interface Deprecation {
   id: string;
@@ -182,18 +183,21 @@ export default function DeprecationListPage() {
     },
   ];
 
-  const options = {
-  };
+  const options = {};
 
   return (
-    <DataTablePage
-      title="All Deprecations"
-      createButtonText="Add Deprecation"
-      createRoute={route.deprecationsNew}
-      loading={loading}
-      data={deprecations}
-      columns={columns}
-      options={options}
-    />
+    <Box p={2}>
+      <Typography variant="h4" fontWeight="bold" gutterBottom paddingLeft={5}>
+        Deprecations Items
+      </Typography>
+      <DataTablePage
+        createButtonText="Add Deprecation"
+        createRoute={route.deprecationsNew}
+        loading={loading}
+        data={deprecations}
+        columns={columns}
+        options={options}
+      />
+    </Box>
   );
 }

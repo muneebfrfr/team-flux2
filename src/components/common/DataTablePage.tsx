@@ -1,23 +1,22 @@
-// components/common/DataTablePage.tsx
 "use client";
-import { ReactNode } from "react";
+
+import type { ReactNode } from "react";
 import Link from "next/link";
 import {
   Box,
   Button,
-  Typography,
   Paper,
   useTheme,
-  CircularProgress
+  CircularProgress,
+  Typography,
 } from "@mui/material";
 import MUIDataTable, {
-  MUIDataTableColumn,
-  MUIDataTableOptions
+  type MUIDataTableColumn,
+  type MUIDataTableOptions,
 } from "mui-datatables";
 import { Add as AddIcon } from "@mui/icons-material";
 
 interface DataTablePageProps {
-  title: string;
   createButtonText: string;
   createRoute: string;
   loading: boolean;
@@ -28,36 +27,38 @@ interface DataTablePageProps {
 }
 
 export default function DataTablePage({
-  title,
   createButtonText,
   createRoute,
   loading,
   data,
   columns,
   options,
-  children
+  children,
 }: DataTablePageProps) {
   const theme = useTheme();
 
-
-  const processedColumns = columns.map(column => ({
+  const processedColumns = columns.map((column) => ({
     ...column,
     options: {
       ...column.options,
-      customHeadLabelRender: (columnMeta: any) => {
-        return (
-          <span style={{ fontWeight: 'bold' }}>
-            {column.label || column.name}
-          </span>
-        );
-      },
+      customHeadLabelRender: (columnMeta: any) => (
+        <Typography
+          variant="subtitle2"
+          sx={{
+            fontWeight: 600,
+            color: theme.palette.text.primary,
+          }}
+        >
+          {column.label || column.name}
+        </Typography>
+      ),
     },
   }));
 
   const defaultOptions: MUIDataTableOptions = {
-    filterType: 'dropdown',
-    responsive: 'standard',
-    selectableRows: 'none',
+    filterType: "dropdown",
+    responsive: "standard",
+    selectableRows: "none",
     print: false,
     download: false,
     viewColumns: true,
@@ -66,106 +67,135 @@ export default function DataTablePage({
     rowsPerPageOptions: [10, 25, 50],
     serverSide: false,
     search: true,
-    tableBodyHeight: 'auto',
-    tableBodyMaxHeight: '500px',
+    searchOpen: false,
+    tableBodyHeight: "auto",
+    tableBodyMaxHeight: "600px",
     textLabels: {
       body: {
         noMatch: loading ? (
-          <Box display="flex" justifyContent="center" p={3}>
-            <CircularProgress size={24} />
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            py={4}
+          >
+            <CircularProgress size={32} />
           </Box>
         ) : (
-          'No records found'
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            py={4}
+          >
+            <Typography variant="body2" color="text.secondary">
+              No records found
+            </Typography>
+          </Box>
         ),
       },
     },
     setRowProps: () => ({
       style: {
         backgroundColor: theme.palette.background.paper,
+        "&:hover": {
+          backgroundColor: theme.palette.action.hover,
+        },
       },
     }),
     setTableProps: () => ({
       sx: {
-        border: `1px solid ${theme.palette.divider}`,
-        borderRadius: 1,
+        "& .MuiTableCell-head": {
+          backgroundColor: theme.palette.grey[50],
+          fontWeight: 600,
+        },
+        "& .MuiTableCell-body": {
+          borderBottom: `1px solid ${theme.palette.divider}`,
+        },
       },
     }),
+    customToolbar: () => (
+      <Link href={createRoute} passHref style={{ textDecoration: "none" }}>
+        <Button
+          variant="contained"
+          startIcon={loading ? null : <AddIcon />}
+          disabled={loading}
+          size="small"
+          sx={{
+            minWidth: 120,
+            height: 32,
+            borderRadius: 1,
+            textTransform: "none",
+            fontWeight: 600,
+          }}
+        >
+          {loading ? (
+            <CircularProgress size={16} color="inherit" />
+          ) : (
+            createButtonText
+          )}
+        </Button>
+      </Link>
+    ),
     ...options,
   };
 
   return (
-    <Box p={2} maxWidth="1600px" margin="0 auto">
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={4}
-        sx={{
-          backgroundColor: theme.palette.background.default,
-          p: 3,
-          borderRadius: 0,
-          boxShadow: theme.shadows[1]
-        }}
-      >
-        <Typography variant="h4" fontWeight="bold">
-          {title}
-        </Typography>
-        <Link href={createRoute} passHref>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            disabled={loading}
-            sx={{
-              px: 3,
-              py: 1,
-              borderRadius: 2,
-              textTransform: 'none',
-              fontWeight: 'bold'
-            }}
-          >
-            {loading ? (
-              <CircularProgress size={20} color="inherit" />
-            ) : (
-              createButtonText
-            )}
-          </Button>
-        </Link>
-      </Box>
+    <Box
+      sx={{
+        p: { xs: 2, sm: 3 },
+        maxWidth: "1600px",
+        margin: "0 auto",
+        minHeight: "100vh",
+      }}
+    >
+      {children && <Box sx={{ mb: 2 }}>{children}</Box>}
 
-      {children}
-
-      <Box
+      {/* Data Table Section */}
+      <Paper
         sx={{
-          '& .MuiTableCell-head': {
-            fontWeight: 'bold !important',
+          borderRadius: 5,
+          overflow: "hidden",
+          border: `1px solid ${theme.palette.divider}`,
+          backgroundColor: "transparent",
+          "& .MUIDataTable-root": {
+            backgroundColor: "transparent",
           },
-          '& .MUIDataTableHeadCell-root': {
-            fontWeight: 'bold !important',
+          "& .MUIDataTableToolbar-root": {
+            backgroundColor: theme.palette.background.paper,
+            borderBottom: `1px solid ${theme.palette.divider}`,
+            minHeight: 64,
+            display: "flex",
+            alignItems: "center",
+            flexDirection: "row-reverse", 
           },
-          '& .MUIDataTableHeadCell-data': {
-            fontWeight: 'bold !important',
+          "& .MUIDataTableToolbar-left": {
+            order: 2, 
           },
-          '& .MUIDataTableHeadCell-sortLabelRoot': {
-            fontWeight: 'bold !important',
+          "& .MUIDataTableToolbar-actions": {
+            order: 1, 
+          },
+          "& .MUIDataTableHeadCell-root": {
+            backgroundColor: theme.palette.grey[50],
+            fontWeight: "600 !important",
+            borderBottom: `2px solid ${theme.palette.divider}`,
+          },
+          "& .MUIDataTableBodyCell-root": {
+            borderBottom: `1px solid ${theme.palette.divider}`,
+          },
+          "& .MUIDataTablePagination-root": {
+            backgroundColor: theme.palette.background.paper,
+            borderTop: `1px solid ${theme.palette.divider}`,
           },
         }}
       >
-        <Paper
-          elevation={2}
-          sx={{
-            border: `1px solid ${theme.palette.divider}`,
-            borderRadius: 10,
-            overflow: 'hidden',
-          }}
-        >
-          <MUIDataTable
-            title=""
-            data={data}
-            columns={processedColumns}
-            options={defaultOptions}
-          />
-        </Paper>
-      </Box>
+        <MUIDataTable
+          title=""
+          data={data}
+          columns={processedColumns}
+          options={defaultOptions}
+        />
+      </Paper>
     </Box>
   );
 }

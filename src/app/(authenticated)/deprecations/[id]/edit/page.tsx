@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import EditDeprecationClient from "./EditDeprecationClient";
+import EditDeprecationClient from "@/app/(authenticated)/deprecations/[id]/edit/EditDeprecationClient";
 
 type EditDeprecationPageProps = {
   params: Promise<{

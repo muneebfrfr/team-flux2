@@ -252,13 +252,17 @@ export default function TechnicalDebtPage() {
   }));
 
   return (
-    <DataTablePage
-      title="Technical Debt Tracker"
-      createButtonText="New Debt Item"
-      createRoute={route.newTechnicalDebt}
-      loading={loading}
-      data={data}
-      columns={columns}
-    />
+    <Box p={2}>
+      <Typography variant="h4" fontWeight="bold" gutterBottom paddingLeft={5}>
+        Technical Debt Items
+      </Typography>
+      <DataTablePage
+        createButtonText="New Debt Item"
+        createRoute={route.newTechnicalDebt}
+        loading={loading}
+        data={data}
+        columns={columns}
+      />
+    </Box>
   );
 }
