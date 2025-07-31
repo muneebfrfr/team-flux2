@@ -1,27 +1,26 @@
+// app/technical-debt/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Link from "next/link";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import Paper from "@mui/material/Paper";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Chip from "@mui/material/Chip";
-import IconButton from "@mui/material/IconButton";
-import CircularProgress from "@mui/material/CircularProgress";
-import route from "@/route";
 import {
-  Add as AddIcon,
+  Chip,
+  IconButton,
+  CircularProgress,
+  Tooltip,
+  Box,
+  Typography,
+} from "@mui/material";
+import {
   Edit as EditIcon,
   Delete as DeleteIcon,
+  CalendarToday as CalendarIcon,
+  Person as PersonIcon,
+  Work as ProjectIcon,
 } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
+import route from "@/route";
+import DataTablePage from "@/components/common/DataTablePage";
 
 interface Project {
   name: string;
@@ -101,95 +100,165 @@ export default function TechnicalDebtPage() {
     }
   };
 
-  return (
-    <Box p={4}>
-      <Box display="flex" justifyContent="space-between" mb={3}>
-        <Typography variant="h4">Technical Debt Tracker</Typography>
-        <Link href={route.newTechnicalDebt}>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            disabled={loading}
-          >
-            {loading ? (
-              <CircularProgress size={20} color="inherit" />
-            ) : (
-              "Create New"
-            )}
-          </Button>
-        </Link>
-      </Box>
+  const columns = [
+    {
+      name: "title",
+      label: "Title",
 
-      <Paper>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Title</TableCell>
-              <TableCell>Project</TableCell>
-              <TableCell>Priority</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Owner</TableCell>
-              <TableCell>Due Date</TableCell>
-              <TableCell align="right">Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell colSpan={7} align="center">
-                  <CircularProgress size={24} />
-                </TableCell>
-              </TableRow>
-            ) : (
-              debtItems.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell>{item.title}</TableCell>
-                  <TableCell>{item.project?.name}</TableCell>
-                  <TableCell>
-                    <Chip
-                      label={item.priority}
-                      color={getPriorityColor(item.priority)}
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={item.status}
-                      color={getStatusColor(item.status)}
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell>{item.owner?.name || "Unassigned"}</TableCell>
-                  <TableCell>
-                    {item.dueDate
-                      ? new Date(item.dueDate).toLocaleDateString()
-                      : "-"}
-                  </TableCell>
-                  <TableCell align="right">
-                    <IconButton
-                      color="primary"
-                      onClick={() => handleEdit(item.id)}
-                      disabled={editLoadingId === item.id}
-                    >
-                      {editLoadingId === item.id ? (
-                        <CircularProgress size={20} color="inherit" />
-                      ) : (
-                        <EditIcon />
-                      )}
-                    </IconButton>
-                    <IconButton
-                      color="error"
-                      onClick={() => handleDelete(item.id)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </Paper>
-    </Box>
+      options: {
+        filter: true,
+        sort: true,
+        customBodyRender: (value: string) => (
+          <Typography fontWeight="medium">{value}</Typography>
+        ),
+      },
+    },
+    {
+      name: "project.name",
+      label: "Project",
+      options: {
+        filter: true,
+        sort: true,
+        customBodyRender: (value: string) => (
+          <Box display="flex" alignItems="center" gap={1}>
+            <ProjectIcon fontSize="small" color="action" />
+            <Typography>{value || "-"}</Typography>
+          </Box>
+        ),
+      },
+    },
+    {
+      name: "priority",
+      label: "Priority",
+      options: {
+        filter: true,
+        sort: true,
+        customBodyRender: (value: string) => (
+          <Chip
+            label={value}
+            color={getPriorityColor(value)}
+            size="small"
+            sx={{
+              fontWeight: "bold",
+              minWidth: 80,
+              justifyContent: "center",
+            }}
+          />
+        ),
+        filterOptions: {
+          names: ["High", "Medium", "Low"],
+        },
+      },
+    },
+    {
+      name: "status",
+      label: "Status",
+      options: {
+        filter: true,
+        sort: true,
+        customBodyRender: (value: string) => (
+          <Chip
+            label={value}
+            color={getStatusColor(value)}
+            size="small"
+            sx={{
+              fontWeight: "bold",
+              minWidth: 100,
+              justifyContent: "center",
+              textTransform: "capitalize",
+            }}
+          />
+        ),
+        filterOptions: {
+          names: ["open", "in-review", "closed"],
+        },
+      },
+    },
+    {
+      name: "owner.name",
+      label: "Owner",
+      options: {
+        filter: true,
+        sort: true,
+        customBodyRender: (value: string) => (
+          <Box display="flex" alignItems="center" gap={1}>
+            <PersonIcon fontSize="small" color="action" />
+            <Typography>{value || "Unassigned"}</Typography>
+          </Box>
+        ),
+      },
+    },
+    {
+      name: "dueDate",
+      label: "Due Date",
+      options: {
+        filter: true,
+        sort: true,
+        customBodyRender: (value: string) => (
+          <Box display="flex" alignItems="center" gap={1}>
+            <CalendarIcon fontSize="small" color="action" />
+            <Typography>
+              {value ? new Date(value).toLocaleDateString() : "-"}
+            </Typography>
+          </Box>
+        ),
+      },
+    },
+    {
+      name: "actions",
+      label: "Actions",
+      options: {
+        filter: false,
+        sort: false,
+        customBodyRender: (value: any, tableMeta: any) => {
+          const item = debtItems[tableMeta.rowIndex];
+          return (
+            <Box display="flex" gap={1}>
+              <Tooltip title="Edit">
+                <IconButton
+                  color="primary"
+                  onClick={() => handleEdit(item.id)}
+                  disabled={editLoadingId === item.id}
+                  size="small"
+                >
+                  {editLoadingId === item.id ? (
+                    <CircularProgress size={20} color="inherit" />
+                  ) : (
+                    <EditIcon fontSize="small" />
+                  )}
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Delete">
+                <IconButton
+                  color="error"
+                  onClick={() => handleDelete(item.id)}
+                  size="small"
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          );
+        },
+      },
+    },
+  ];
+
+  const data = debtItems.map((item) => ({
+    ...item,
+    "project.name": item.project?.name,
+    "owner.name": item.owner?.name,
+    actions: "",
+  }));
+
+  return (
+    <DataTablePage
+      title="Technical Debt Tracker"
+      createButtonText="New Debt Item"
+      createRoute={route.newTechnicalDebt}
+      loading={loading}
+      data={data}
+      columns={columns}
+    />
   );
 }
