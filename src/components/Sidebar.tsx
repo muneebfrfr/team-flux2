@@ -79,12 +79,12 @@ export default function Sidebar({ open=false, width = 240, onClose }: SidebarPro
             { text: "Sessions", icon: <EventNoteIcon />, path: route.sessions },
             { text: "Projects", icon: <LaptopIcon />, path: route.projects },
             {
-              text: "Deprecation Tracker",
+              text: "Deprecation",
               icon: <ArticleIcon />,
               path: route.deprecations,
             },
             {
-              text: "Technical Debt",
+              text: "TechnicalDebt",
               icon: <DataArrayIcon />,
               path: route.technicalDebt,
             },

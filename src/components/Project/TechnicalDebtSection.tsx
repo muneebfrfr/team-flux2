@@ -24,6 +24,7 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemText from "@mui/material/ListItemText";
+import toast from "react-hot-toast";
 
 import {
   Edit,
@@ -35,6 +36,7 @@ import AppTextField from "@/components/ui/AppTextField";
 import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { useSession } from "next-auth/react";
+import DeleteConfirmationDialog from "../DeleteConfirmationDialog";
 
 interface Comment {
   id: string;
@@ -54,7 +56,7 @@ interface TechnicalDebt {
   description: string;
   ownerId: string;
   priority: "Low" | "Medium" | "High";
-  status: "open" | "in-review" | "closed";
+  status: "open" | "in_review" | "closed";
   dueDate: string;
   owner?: {
     id: string;
@@ -105,6 +107,8 @@ function TechnicalDebtContent({ projectId }: Props) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const { data: session } = useSession();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [debtToDelete, setDebtToDelete] = useState<string | null>(null);
 
   const [selectedDebtForConvert, setSelectedDebtForConvert] =
     useState<TechnicalDebt | null>(null);
@@ -123,6 +127,7 @@ function TechnicalDebtContent({ projectId }: Props) {
       setDebts(Array.isArray(res.data.data) ? res.data.data : []);
     } catch (err) {
       console.error("Failed to fetch technical debts", err);
+      toast.error("Failed to fetch technical debts");
     } finally {
       setLoading(false);
     }
@@ -136,15 +141,17 @@ function TechnicalDebtContent({ projectId }: Props) {
       );
     } catch (err) {
       console.error("Failed to fetch users", err);
+      toast.error("Failed to fetch users");
     }
   }, []);
 
   const fetchComments = useCallback(async (debtId: string) => {
     try {
-      const res = await axios.get(`/api/comments/${debtId}`);
+      const res = await axios.get(`/api/technical-debt/${debtId}/comments`);
       setComments(res.data.data || []);
     } catch (err) {
       console.error("Failed to fetch comments", err);
+      toast.error("Failed to fetch comments");
     }
   }, []);
 
@@ -188,31 +195,27 @@ function TechnicalDebtContent({ projectId }: Props) {
     try {
       if (isEditMode && formData.id) {
         await axios.put(`/api/technical-debt/${formData.id}`, formData);
+        toast.success("Technical debt updated successfully");
       } else {
         await axios.post("/api/technical-debt", {
           ...formData,
           projectId,
         });
+        toast.success("Technical debt created successfully");
       }
       setFormOpen(false);
       await fetchTechnicalDebts();
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
-        setSubmitError(error?.response?.data?.error || "Failed to submit");
+        const errorMsg = error?.response?.data?.error || "Failed to submit";
+        setSubmitError(errorMsg);
+        toast.error(errorMsg);
       } else {
         setSubmitError("Failed to submit");
+        toast.error("Failed to submit technical debt");
       }
     } finally {
       setSubmitting(false);
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    try {
-      await axios.delete(`/api/technical-debt/${id}`);
-      await fetchTechnicalDebts();
-    } catch (error) {
-      console.error("Failed to delete technical debt", error);
     }
   };
 
@@ -264,17 +267,17 @@ function TechnicalDebtContent({ projectId }: Props) {
       setSelectedDebtForConvert(null);
       await fetchTechnicalDebts();
 
-      alert(
-        `Successfully converted technical debt to deprecation!\nDeprecation: "${convertData.deprecatedItem}"`
+      toast.success(
+        `Successfully converted technical debt to deprecation: "${convertData.deprecatedItem}"`
       );
     } catch (error) {
       console.error("Failed to convert technical debt", error);
       if (axios.isAxiosError(error)) {
-        alert(
+        toast.error(
           `Failed to convert: ${error.response?.data?.error || "Unknown error"}`
         );
       } else {
-        alert("Failed to convert technical debt. Please try again.");
+        toast.error("Failed to convert technical debt. Please try again.");
       }
     } finally {
       setConverting(false);
@@ -308,9 +311,37 @@ function TechnicalDebtContent({ projectId }: Props) {
       setComments((prev) => [...prev, res.data.data]);
       setNewComment("");
       await fetchTechnicalDebts();
+      toast.success("Comment added successfully");
     } catch (error) {
       console.error("Failed to post comment", error);
+      toast.error("Failed to post comment");
     }
+  };
+
+  const handleDeleteClick = (id: string) => {
+    setDebtToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!debtToDelete) return;
+
+    try {
+      await axios.delete(`/api/technical-debt/${debtToDelete}`);
+      await fetchTechnicalDebts();
+      toast.success("Technical debt deleted successfully");
+    } catch (error) {
+      console.error("Failed to delete technical debt", error);
+      toast.error("Failed to delete technical debt");
+    } finally {
+      setDeleteDialogOpen(false);
+      setDebtToDelete(null);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteDialogOpen(false);
+    setDebtToDelete(null);
   };
 
   const formatDate = (str: string) =>
@@ -357,7 +388,7 @@ function TechnicalDebtContent({ projectId }: Props) {
                     color={
                       debt.status === "closed"
                         ? "success"
-                        : debt.status === "in-review"
+                        : debt.status === "in_review"
                         ? "warning"
                         : "default"
                     }
@@ -386,7 +417,6 @@ function TechnicalDebtContent({ projectId }: Props) {
                   >
                     <Edit fontSize="small" />
                   </IconButton>
-
                   <IconButton
                     size="small"
                     title="Comments"
@@ -417,7 +447,6 @@ function TechnicalDebtContent({ projectId }: Props) {
                       </Box>
                     )}
                   </IconButton>
-
                   {debt.status !== "closed" && (
                     <IconButton
                       size="small"
@@ -436,15 +465,21 @@ function TechnicalDebtContent({ projectId }: Props) {
                       <ConvertIcon fontSize="small" />
                     </IconButton>
                   )}
-
                   <IconButton
                     size="small"
                     title="Delete"
                     color="error"
-                    onClick={() => handleDelete(debt.id)}
+                    onClick={() => handleDeleteClick(debt.id)}
                   >
                     <Delete fontSize="small" />
                   </IconButton>
+                  <DeleteConfirmationDialog
+                    open={deleteDialogOpen}
+                    onClose={handleCancelDelete}
+                    onConfirm={handleConfirmDelete}
+                    title="Delete Technical Debt"
+                    message="Are you sure you want to delete this technical debt item? This action cannot be undone."
+                  />
                 </TableCell>
               </TableRow>
             ))}
@@ -521,7 +556,7 @@ function TechnicalDebtContent({ projectId }: Props) {
             onChange={handleChange}
           >
             <MenuItem value="open">Open</MenuItem>
-            <MenuItem value="in-review">In Review</MenuItem>
+            <MenuItem value="in_review">In Review</MenuItem>
             <MenuItem value="closed">Closed</MenuItem>
           </AppTextField>
           <AppTextField

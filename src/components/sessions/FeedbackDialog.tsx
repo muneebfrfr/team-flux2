@@ -16,6 +16,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Rating from "@mui/material/Rating";
+import CircularProgress from "@mui/material/CircularProgress";
 
 import AppTextField from "@/components/ui/AppTextField";
 import { User } from "@/app/(authenticated)/sessions/types";
@@ -42,14 +43,17 @@ const FeedbackDialog: React.FC<FeedbackDialogProps> = ({
     rating: 0,
     comments: "",
   });
+  const [submitting, setSubmitting] = useState(false);
 
   const resetForm = () => {
     setNewFeedback({ userId: "", rating: 0, comments: "" });
   };
 
   const handleClose = () => {
-    resetForm();
-    onClose();
+    if (!submitting) {
+      resetForm();
+      onClose();
+    }
   };
 
   const submitFeedback = async () => {
@@ -59,13 +63,21 @@ const FeedbackDialog: React.FC<FeedbackDialogProps> = ({
     }
 
     try {
+      setSubmitting(true);
       await axios.post(`/api/sessions/${sessionId}/feedbacks`, newFeedback);
       toast.success("Feedback submitted successfully");
+
+      // Call the callback to update parent state
       onFeedbackSubmitted(sessionId);
+
+      // Reset form and close dialog
       resetForm();
+      onClose();
     } catch (err) {
       console.error("Failed to submit feedback:", err);
       toast.error("Failed to submit feedback");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -106,7 +118,7 @@ const FeedbackDialog: React.FC<FeedbackDialogProps> = ({
                 }))
               }
               label="Your Name"
-              disabled={users.length === 0}
+              disabled={users.length === 0 || submitting}
             >
               {users.length === 0 ? (
                 <MenuItem disabled>No users available</MenuItem>
@@ -129,6 +141,7 @@ const FeedbackDialog: React.FC<FeedbackDialogProps> = ({
                 setNewFeedback((prev) => ({ ...prev, rating: value || 0 }))
               }
               size="large"
+              disabled={submitting}
             />
           </Box>
           <AppTextField
@@ -143,14 +156,23 @@ const FeedbackDialog: React.FC<FeedbackDialogProps> = ({
             multiline
             rows={4}
             fullWidth
+            disabled={submitting}
             placeholder="Share your thoughts about the session, what you learned, suggestions for improvement..."
           />
         </Stack>
       </DialogContent>
       <DialogActions sx={{ paddingRight: 3, paddingBottom: 2 }}>
-        <Button onClick={handleClose}>Cancel</Button>
-        <Button onClick={submitFeedback} variant="contained" color="secondary">
-          Submit Feedback
+        <Button onClick={handleClose} disabled={submitting}>
+          Cancel
+        </Button>
+        <Button
+          onClick={submitFeedback}
+          variant="contained"
+          color="secondary"
+          disabled={submitting}
+          startIcon={submitting ? <CircularProgress size={20} /> : null}
+        >
+          {submitting ? "Submitting..." : "Submit Feedback"}
         </Button>
       </DialogActions>
     </Dialog>

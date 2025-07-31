@@ -117,12 +117,12 @@ export default function GrowthSessionsPage() {
     if (!session) return;
 
     if (!session.expanded) {
+      setSessions((prev) =>
+        prev.map((s) => ({ ...s, expanded: s.id === sessionId }))
+      );
+
       if (!session.detailsLoaded) {
         fetchSessionDetails(sessionId);
-      } else {
-        setSessions((prev) =>
-          prev.map((s) => (s.id === sessionId ? { ...s, expanded: true } : s))
-        );
       }
     } else {
       setSessions((prev) =>
@@ -172,7 +172,7 @@ export default function GrowthSessionsPage() {
         mb={3}
       >
         <Box>
-          <Typography variant="h4" fontWeight="bold"  gutterBottom>
+          <Typography variant="h4" fontWeight="bold" gutterBottom>
             Growth Sessions
           </Typography>
           <Typography variant="subtitle1" color="text.secondary">
@@ -184,7 +184,6 @@ export default function GrowthSessionsPage() {
           variant="contained"
           color="secondary"
           size="large"
-          
           startIcon={<AddIcon />}
           onClick={openCreateDialog}
         >
