@@ -1,0 +1,336 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import Alert from "@mui/material/Alert";
+import MenuItem from "@mui/material/MenuItem";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Grid from "@mui/material/Grid";
+import AppFieldText from "@/components/ui/AppTextField";
+import route from "@/route";
+import ThemeRegistry from "@/components/ThemeRegistry";
+
+interface Project {
+  id: string;
+  name: string;
+}
+
+interface DeprecationFormData {
+  projectId: string;
+  deprecatedItem: string;
+  suggestedReplacement: string;
+  migrationNotes: string;
+  timelineStart: string;
+  deadline: string;
+  progressStatus: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
+}
+
+const defaultFormData: DeprecationFormData = {
+  projectId: "",
+  deprecatedItem: "",
+  suggestedReplacement: "",
+  migrationNotes: "",
+  timelineStart: "",
+  deadline: "",
+  progressStatus: "NOT_STARTED",
+};
+
+interface DeprecationFormProps {
+  deprecationId?: string;
+  mode: "create" | "edit";
+}
+
+export default function DeprecationForm({ deprecationId, mode }: DeprecationFormProps) {
+  const router = useRouter();
+  const isEditMode = mode === "edit";
+
+  const [formData, setFormData] = useState<DeprecationFormData>(defaultFormData);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const projectsRes = await axios.get("/api/projects");
+        setProjects(Array.isArray(projectsRes.data) ? projectsRes.data : projectsRes.data.data || []);
+        if (isEditMode && deprecationId) {
+          const deprecationRes = await axios.get(`/api/deprecations/${deprecationId}`);
+          const deprecationData = deprecationRes.data;
+          setFormData({
+            projectId: deprecationData.projectId || "",
+            deprecatedItem: deprecationData.deprecatedItem || "",
+            suggestedReplacement: deprecationData.suggestedReplacement || "",
+            migrationNotes: deprecationData.migrationNotes || "",
+            timelineStart: deprecationData.timelineStart ? deprecationData.timelineStart.split('T')[0] : "",
+            deadline: deprecationData.deadline ? deprecationData.deadline.split('T')[0] : "",
+            progressStatus: deprecationData.progressStatus || "NOT_STARTED",
+          });
+        }
+        
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+        setSubmitError(isEditMode ? "Failed to load deprecation data" : "Failed to load projects");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [deprecationId, isEditMode]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    if (submitError) {
+      setSubmitError("");
+    }
+  };
+
+  const validateForm = (): boolean => {
+    if (!formData.deprecatedItem.trim()) {
+      setSubmitError("Deprecated item is required");
+      return false;
+    }
+    
+    if (!formData.projectId) {
+      setSubmitError("Project is required");
+      return false;
+    }
+    
+    if (!formData.timelineStart) {
+      setSubmitError("Timeline start date is required");
+      return false;
+    }
+    
+    if (!formData.deadline) {
+      setSubmitError("Deadline is required");
+      return false;
+    }
+    if (new Date(formData.deadline) < new Date(formData.timelineStart)) {
+      setSubmitError("Deadline must be after timeline start date");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    setSubmitting(true);
+    setSubmitError("");
+    setSubmitSuccess(false);
+
+    try {
+      if (isEditMode) {
+        await axios.put(`/api/deprecations/${deprecationId}`, formData);
+        setSubmitSuccess(true);
+        setTimeout(() => {
+          router.push(route.deprecations);
+        }, 1500);
+      } else {
+        await axios.post("/api/deprecations", formData);
+        router.push(route.deprecations);
+      }
+      
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        setSubmitError(err?.response?.data?.error || `Failed to ${isEditMode ? 'update' : 'create'} deprecation`);
+      } else {
+        setSubmitError(`Failed to ${isEditMode ? 'update' : 'create'} deprecation`);
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleCancel = () => {
+    router.push(route.deprecations);
+  };
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  return (
+    <ThemeRegistry>
+      <Box p={3}>
+        <Typography variant="h4" fontWeight="bold" gutterBottom>
+          {isEditMode ? 'Edit Deprecation' : 'Add New Deprecation'}
+        </Typography>
+        
+        <Card>
+          <CardContent>
+            <form onSubmit={handleSubmit}>
+              <Grid container spacing={3}>
+                <Grid item xs={12} md={6}>
+                  <AppFieldText
+                    select
+                    label="Project"
+                    name="projectId"
+                    value={formData.projectId}
+                    onChange={handleChange}
+                    fullWidth
+                    required
+                    disabled={submitting}
+                  >
+                    <MenuItem value="">
+                      <em>Select a project</em>
+                    </MenuItem>
+                    {projects.map((project) => (
+                      <MenuItem key={project.id} value={project.id}>
+                        {project.name}
+                      </MenuItem>
+                    ))}
+                  </AppFieldText>
+                </Grid>
+                
+                <Grid item xs={12} md={6}>
+                  <AppFieldText
+                    select
+                    label="Progress Status"
+                    name="progressStatus"
+                    value={formData.progressStatus}
+                    onChange={handleChange}
+                    fullWidth
+                    required
+                    disabled={submitting}
+                  >
+                    <MenuItem value="NOT_STARTED">Not Started</MenuItem>
+                    <MenuItem value="IN_PROGRESS">In Progress</MenuItem>
+                    <MenuItem value="COMPLETED">Completed</MenuItem>
+                  </AppFieldText>
+                </Grid>
+                
+                <Grid item xs={12}>
+                  <AppFieldText
+                    label="Deprecated Item"
+                    name="deprecatedItem"
+                    value={formData.deprecatedItem}
+                    onChange={handleChange}
+                    fullWidth
+                    required
+                    disabled={submitting}
+                    placeholder="e.g., Legacy API v1, Old Authentication System"
+                  />
+                </Grid>
+                
+                <Grid item xs={12}>
+                  <AppFieldText
+                    label="Suggested Replacement"
+                    name="suggestedReplacement"
+                    value={formData.suggestedReplacement}
+                    onChange={handleChange}
+                    fullWidth
+                    disabled={submitting}
+                    placeholder="e.g., New API v2, OAuth 2.0 System"
+                  />
+                </Grid>
+                
+                <Grid item xs={12}>
+                  <AppFieldText
+                    label="Migration Notes"
+                    name="migrationNotes"
+                    value={formData.migrationNotes}
+                    onChange={handleChange}
+                    fullWidth
+                    multiline
+                    rows={4}
+                    disabled={submitting}
+                    placeholder="Provide detailed migration instructions, breaking changes, and considerations..."
+                  />
+                </Grid>
+                
+                <Grid item xs={12} md={6}>
+                  <AppFieldText
+                    label="Timeline Start"
+                    name="timelineStart"
+                    type="date"
+                    value={formData.timelineStart}
+                    onChange={handleChange}
+                    fullWidth
+                    required
+                    disabled={submitting}
+                    InputLabelProps={{ shrink: true }}
+                  />
+                </Grid>
+                
+                <Grid item xs={12} md={6}>
+                  <AppFieldText
+                    label="Deadline"
+                    name="deadline"
+                    type="date"
+                    value={formData.deadline}
+                    onChange={handleChange}
+                    fullWidth
+                    required
+                    disabled={submitting}
+                    InputLabelProps={{ shrink: true }}
+                  />
+                </Grid>
+                
+                {submitError && (
+                  <Grid item xs={12}>
+                    <Alert severity="error">{submitError}</Alert>
+                  </Grid>
+                )}
+                
+                {submitSuccess && (
+                  <Grid item xs={12}>
+                    <Alert severity="success">
+                      Deprecation updated successfully! Redirecting...
+                    </Alert>
+                  </Grid>
+                )}
+                
+                <Grid item xs={12}>
+                  <Box display="flex" gap={2} justifyContent="flex-end">
+                    <Button
+                      variant="outlined"
+                      onClick={handleCancel}
+                      disabled={submitting}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      disabled={submitting}
+                      color="secondary"
+                    >
+                      {submitting 
+                        ? (isEditMode ? "Updating..." : "Creating...") 
+                        : (isEditMode ? "Update Deprecation" : "Create Deprecation")
+                      }
+                    </Button>
+                  </Box>
+                </Grid>
+              </Grid>
+            </form>
+          </CardContent>
+        </Card>
+      </Box>
+    </ThemeRegistry>
+  );
+}

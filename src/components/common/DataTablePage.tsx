@@ -117,6 +117,7 @@ export default function DataTablePage({
     customToolbar: () => (
       <Link href={createRoute} passHref style={{ textDecoration: "none" }}>
         <Button
+          color="secondary"
           variant="contained"
           startIcon={loading ? null : <AddIcon />}
           disabled={loading}
@@ -167,13 +168,13 @@ export default function DataTablePage({
             minHeight: 64,
             display: "flex",
             alignItems: "center",
-            flexDirection: "row-reverse", 
+            flexDirection: "row-reverse",
           },
           "& .MUIDataTableToolbar-left": {
-            order: 2, 
+            order: 2,
           },
           "& .MUIDataTableToolbar-actions": {
-            order: 1, 
+            order: 1,
           },
           "& .MUIDataTableHeadCell-root": {
             backgroundColor: theme.palette.grey[50],

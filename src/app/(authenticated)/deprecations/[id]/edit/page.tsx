@@ -1,24 +1,11 @@
-import { notFound } from "next/navigation";
-import EditDeprecationClient from "@/app/(authenticated)/deprecations/[id]/edit/EditDeprecationClient";
+"use client";
 
-type EditDeprecationPageProps = {
-  params: Promise<{
-    id: string;
-  }>;
-};
+import { useParams } from "next/navigation";
+import DeprecationForm from "@/components/deprecations/DeprecationForm";
 
-export default async function EditDeprecationPage({
-  params,
-}: EditDeprecationPageProps) {
-  const { id } = await params;
-  
-  const baseUrl = process.env.BASE_URL || "http://localhost:3000";
-  const res = await fetch(`${baseUrl}/api/deprecations/${id}`, {
-    cache: "no-store",
-  });
-  
-  if (!res.ok) return notFound();
-  
-  const data = await res.json();
-  return <EditDeprecationClient initialData={data} />;
+export default function DeprecationEditPage() {
+  const params = useParams();
+  const deprecationId = params?.id as string;
+
+  return <DeprecationForm deprecationId={deprecationId} mode="edit" />;
 }
