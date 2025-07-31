@@ -27,6 +27,15 @@ const theme = createTheme({
       contrastText: "#764ba2",
     },
   },
+  components: {
+    MuiTableCell: {
+      styleOverrides: {
+        head: {
+          fontWeight: "700",
+        },
+      },
+    },
+  },
 });
 
 export default function ThemeRegistry({ children }: { children: ReactNode }) {

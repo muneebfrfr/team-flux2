@@ -1,19 +1,18 @@
 // components/common/DataTablePage.tsx
 "use client";
-
 import { ReactNode } from "react";
 import Link from "next/link";
-import { 
-  Box, 
-  Button, 
-  Typography, 
-  Paper, 
+import {
+  Box,
+  Button,
+  Typography,
+  Paper,
   useTheme,
   CircularProgress
 } from "@mui/material";
-import MUIDataTable, { 
-  MUIDataTableColumn, 
-  MUIDataTableOptions 
+import MUIDataTable, {
+  MUIDataTableColumn,
+  MUIDataTableOptions
 } from "mui-datatables";
 import { Add as AddIcon } from "@mui/icons-material";
 
@@ -39,6 +38,21 @@ export default function DataTablePage({
   children
 }: DataTablePageProps) {
   const theme = useTheme();
+
+
+  const processedColumns = columns.map(column => ({
+    ...column,
+    options: {
+      ...column.options,
+      customHeadLabelRender: (columnMeta: any) => {
+        return (
+          <span style={{ fontWeight: 'bold' }}>
+            {column.label || column.name}
+          </span>
+        );
+      },
+    },
+  }));
 
   const defaultOptions: MUIDataTableOptions = {
     filterType: 'dropdown',
@@ -80,16 +94,16 @@ export default function DataTablePage({
   };
 
   return (
-    <Box p={4} maxWidth="1600px" margin="0 auto">
-      <Box 
-        display="flex" 
-        justifyContent="space-between" 
+    <Box p={2} maxWidth="1600px" margin="0 auto">
+      <Box
+        display="flex"
+        justifyContent="space-between"
         alignItems="center"
         mb={4}
         sx={{
           backgroundColor: theme.palette.background.default,
           p: 3,
-          borderRadius: 1,
+          borderRadius: 0,
           boxShadow: theme.shadows[1]
         }}
       >
@@ -120,21 +134,38 @@ export default function DataTablePage({
 
       {children}
 
-      <Paper
-        elevation={0}
+      <Box
         sx={{
-          border: `1px solid ${theme.palette.divider}`,
-          borderRadius: 2,
-          overflow: 'hidden'
+          '& .MuiTableCell-head': {
+            fontWeight: 'bold !important',
+          },
+          '& .MUIDataTableHeadCell-root': {
+            fontWeight: 'bold !important',
+          },
+          '& .MUIDataTableHeadCell-data': {
+            fontWeight: 'bold !important',
+          },
+          '& .MUIDataTableHeadCell-sortLabelRoot': {
+            fontWeight: 'bold !important',
+          },
         }}
       >
-        <MUIDataTable
-          title=""
-          data={data}
-          columns={columns}
-          options={defaultOptions}
-        />
-      </Paper>
+        <Paper
+          elevation={2}
+          sx={{
+            border: `1px solid ${theme.palette.divider}`,
+            borderRadius: 10,
+            overflow: 'hidden',
+          }}
+        >
+          <MUIDataTable
+            title=""
+            data={data}
+            columns={processedColumns}
+            options={defaultOptions}
+          />
+        </Paper>
+      </Box>
     </Box>
   );
 }
