@@ -20,7 +20,9 @@ import {
 import { useRouter } from "next/navigation";
 import route from "@/route";
 import DataTablePage from "@/components/common/DataTablePage";
+import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 import { MUIDataTableMeta } from "mui-datatables";
+import toast from "react-hot-toast";
 
 interface Project {
   name: string;
@@ -44,6 +46,7 @@ export default function TechnicalDebtPage() {
   const [debtItems, setDebtItems] = useState<TechnicalDebtItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [editLoadingId, setEditLoadingId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const router = useRouter();
 
   const fetchDebt = async () => {
@@ -53,15 +56,24 @@ export default function TechnicalDebtPage() {
       setDebtItems(res.data.data);
     } catch (err) {
       console.error("Error fetching technical debt:", err);
+      toast.error("Failed to fetch technical debt items.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this debt item?")) {
-      await axios.delete(`/api/technical-debt/${id}`);
+  const confirmDelete = async () => {
+    if (!deleteId) return;
+
+    try {
+      await axios.delete(`/api/technical-debt/${deleteId}`);
+      toast.success("Debt item deleted.");
       fetchDebt();
+    } catch (error) {
+      console.error("Delete error:", error);
+      toast.error("Failed to delete item.");
+    } finally {
+      setDeleteId(null);
     }
   };
 
@@ -137,11 +149,7 @@ export default function TechnicalDebtPage() {
             label={value}
             color={getPriorityColor(value)}
             size="small"
-            sx={{
-              fontWeight: "bold",
-              minWidth: 80,
-              justifyContent: "center",
-            }}
+            sx={{ fontWeight: "bold", minWidth: 80, justifyContent: "center" }}
           />
         ),
         filterOptions: {
@@ -230,7 +238,7 @@ export default function TechnicalDebtPage() {
               <Tooltip title="Delete">
                 <IconButton
                   color="error"
-                  onClick={() => handleDelete(item.id)}
+                  onClick={() => setDeleteId(item.id)}
                   size="small"
                 >
                   <DeleteIcon fontSize="small" />
@@ -255,12 +263,21 @@ export default function TechnicalDebtPage() {
       <Typography variant="h4" fontWeight="bold" gutterBottom paddingLeft={5}>
         Technical Debt Items
       </Typography>
+
       <DataTablePage
         createButtonText="New Debt Item"
         createRoute={route.newTechnicalDebt}
         loading={loading}
         data={data}
         columns={columns}
+      />
+
+      <DeleteConfirmationDialog
+        open={!!deleteId}
+        onClose={() => setDeleteId(null)}
+        onConfirm={confirmDelete}
+        title="Delete Debt Item"
+        message="Are you sure you want to delete this debt item?"
       />
     </Box>
   );

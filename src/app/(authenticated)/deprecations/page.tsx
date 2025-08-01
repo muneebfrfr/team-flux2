@@ -3,15 +3,19 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import Box from "@mui/material/Box";
-import IconButton from "@mui/material/IconButton";
-import CircularProgress from "@mui/material/CircularProgress";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+import {
+  Box,
+  IconButton,
+  CircularProgress,
+  Chip,
+  Typography,
+} from "@mui/material";
+import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
 import route from "@/route";
 import DataTablePage from "@/components/common/DataTablePage";
-import { Typography } from "@mui/material";
+import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 import { MUIDataTableMeta } from "mui-datatables";
+import toast from "react-hot-toast";
 
 interface Deprecation {
   id: string;
@@ -21,7 +25,7 @@ interface Deprecation {
   migrationNotes?: string;
   timelineStart: string;
   deadline: string;
-  progressStatus: string;
+  progressStatus: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
   createdAt: string;
   updatedAt: string;
   project?: { id: string; name: string };
@@ -31,35 +35,65 @@ export default function DeprecationListPage() {
   const [deprecations, setDeprecations] = useState<Deprecation[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteLoadingId, setDeleteLoadingId] = useState<string | null>(null);
-
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [editLoadingId, setEditLoadingId] = useState<string | null>(null);
   const router = useRouter();
 
-  async function fetch() {
+  async function fetchDeprecations() {
+    setLoading(true);
     try {
       const res = await axios.get("/api/deprecations");
       setDeprecations(res.data.data);
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to fetch deprecations");
     } finally {
       setLoading(false);
     }
   }
 
   useEffect(() => {
-    fetch();
+    fetchDeprecations();
   }, []);
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Delete this deprecation?")) return;
-
     try {
       setDeleteLoadingId(id);
       await axios.delete(`/api/deprecations/${id}`);
-      await fetch();
+      await fetchDeprecations();
+      toast.success("Deprecation deleted successfully");
     } catch (error) {
       console.error(error);
+      toast.error("Failed to delete deprecation");
     } finally {
       setDeleteLoadingId(null);
+      setDeleteId(null);
+    }
+  };
+
+  const getStatusDisplay = (status: string) => {
+    switch (status) {
+      case "NOT_STARTED":
+        return "Not Started";
+      case "IN_PROGRESS":
+        return "In Progress";
+      case "COMPLETED":
+        return "Completed";
+      default:
+        return status;
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "NOT_STARTED":
+        return "default";
+      case "IN_PROGRESS":
+        return "warning";
+      case "COMPLETED":
+        return "success";
+      default:
+        return "info";
     }
   };
 
@@ -70,6 +104,9 @@ export default function DeprecationListPage() {
       options: {
         filter: true,
         sort: true,
+        customBodyRender: (value: string) => (
+          <Typography fontWeight="medium">{value}</Typography>
+        ),
       },
     },
     {
@@ -78,7 +115,9 @@ export default function DeprecationListPage() {
       options: {
         filter: true,
         sort: true,
-        customBodyRender: (value: unknown) => (value as string) || "-",
+        customBodyRender: (value: string) => (
+          <Typography>{value || "-"}</Typography>
+        ),
       },
     },
     {
@@ -87,17 +126,22 @@ export default function DeprecationListPage() {
       options: {
         filter: true,
         sort: true,
-        customBodyRender: (value: unknown) => (value as string) || "-",
+        customBodyRender: (value: string) => (
+          <Typography>{value || "-"}</Typography>
+        ),
       },
     },
     {
       name: "timelineStart",
-      label: "Start",
+      label: "Start Date",
       options: {
         filter: true,
         sort: true,
-        customBodyRender: (value: unknown) =>
-          new Date(value as string).toLocaleDateString(),
+        customBodyRender: (value: string) => (
+          <Typography>
+            {value ? new Date(value).toLocaleDateString() : "-"}
+          </Typography>
+        ),
       },
     },
     {
@@ -106,8 +150,26 @@ export default function DeprecationListPage() {
       options: {
         filter: true,
         sort: true,
-        customBodyRender: (value: unknown) =>
-          new Date(value as string).toLocaleDateString(),
+        customBodyRender: (value: string) => (
+          <Typography
+            fontWeight={
+              new Date(value) < new Date() &&
+              deprecations.find((d) => d.id === value)?.progressStatus !==
+                "COMPLETED"
+                ? "bold"
+                : "normal"
+            }
+            color={
+              new Date(value) < new Date() &&
+              deprecations.find((d) => d.id === value)?.progressStatus !==
+                "COMPLETED"
+                ? "error"
+                : "inherit"
+            }
+          >
+            {value ? new Date(value).toLocaleDateString() : "-"}
+          </Typography>
+        ),
       },
     },
     {
@@ -116,6 +178,26 @@ export default function DeprecationListPage() {
       options: {
         filter: true,
         sort: true,
+        customBodyRender: (
+          value: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED"
+        ) => (
+          <Chip
+            label={getStatusDisplay(value)}
+            color={getStatusColor(value)}
+            size="small"
+            sx={{
+              fontWeight: "bold",
+              minWidth: 100,
+              textTransform: "capitalize",
+            }}
+          />
+        ),
+        filterOptions: {
+          names: ["NOT_STARTED", "IN_PROGRESS", "COMPLETED"],
+          logic(status: string, filterValue: string[]) {
+            return filterValue.indexOf(status) === -1;
+          },
+        },
       },
     },
     {
@@ -124,31 +206,17 @@ export default function DeprecationListPage() {
       options: {
         filter: true,
         sort: true,
-        customBodyRender: (value: unknown, tableMeta: MUIDataTableMeta) => {
+        customBodyRender: (
+          value: { name?: string },
+          tableMeta: MUIDataTableMeta
+        ) => {
           const rowData = deprecations[tableMeta.rowIndex];
-          const project = value as { name?: string };
-          return project?.name || rowData.projectId;
+          return (
+            <Typography fontWeight="medium">
+              {value?.name || rowData.projectId}
+            </Typography>
+          );
         },
-      },
-    },
-    {
-      name: "createdAt",
-      label: "Created",
-      options: {
-        filter: true,
-        sort: true,
-        customBodyRender: (value: unknown) =>
-          new Date(value as string).toLocaleDateString(),
-      },
-    },
-    {
-      name: "updatedAt",
-      label: "Updated",
-      options: {
-        filter: true,
-        sort: true,
-        customBodyRender: (value: unknown) =>
-          new Date(value as string).toLocaleDateString(),
       },
     },
     {
@@ -160,22 +228,32 @@ export default function DeprecationListPage() {
         customBodyRender: (_value: unknown, tableMeta: MUIDataTableMeta) => {
           const id = deprecations[tableMeta.rowIndex].id;
           return (
-            <Box display="flex" justifyContent="center">
+            <Box display="flex" gap={1}>
               <IconButton
-                onClick={() => router.push(route.deprecationsEdit(id))}
+                onClick={() => {
+                  setEditLoadingId(id);
+                  router.push(route.deprecationsEdit(id));
+                }}
                 color="primary"
+                size="small"
+                disabled={editLoadingId === id}
               >
-                <EditIcon />
+                {editLoadingId === id ? (
+                  <CircularProgress size={20} color="inherit" />
+                ) : (
+                  <EditIcon fontSize="small" />
+                )}
               </IconButton>
               <IconButton
                 color="error"
-                onClick={() => handleDelete(id)}
+                onClick={() => setDeleteId(id)}
                 disabled={deleteLoadingId === id}
+                size="small"
               >
                 {deleteLoadingId === id ? (
                   <CircularProgress size={20} color="error" />
                 ) : (
-                  <DeleteIcon />
+                  <DeleteIcon fontSize="small" />
                 )}
               </IconButton>
             </Box>
@@ -185,20 +263,26 @@ export default function DeprecationListPage() {
     },
   ];
 
-  const options = {};
-
   return (
     <Box p={2}>
       <Typography variant="h4" fontWeight="bold" gutterBottom paddingLeft={5}>
-        Deprecations Items
+        Deprecations
       </Typography>
+
       <DataTablePage
         createButtonText="Add Deprecation"
         createRoute={route.deprecationsNew}
         loading={loading}
         data={deprecations}
         columns={columns}
-        options={options}
+      />
+
+      <DeleteConfirmationDialog
+        open={!!deleteId}
+        onClose={() => setDeleteId(null)}
+        onConfirm={() => handleDelete(deleteId!)}
+        title="Delete Deprecation"
+        message="Are you sure you want to delete this deprecation?"
       />
     </Box>
   );

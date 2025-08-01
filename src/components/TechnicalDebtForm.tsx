@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -44,12 +45,17 @@ export default function TechnicalDebtForm({ type, id }: Props) {
 
   useEffect(() => {
     const fetchData = async () => {
-      const [projectRes, userRes] = await Promise.all([
-        axios.get("/api/projects"),
-        axios.get("/api/get-users"),
-      ]);
-      setProjects(projectRes.data.data);
-      setUsers(userRes.data.data ?? userRes.data); // Support both formats
+      try {
+        const [projectRes, userRes] = await Promise.all([
+          axios.get("/api/projects"),
+          axios.get("/api/get-users"),
+        ]);
+        setProjects(projectRes.data.data);
+        setUsers(userRes.data.data ?? userRes.data);
+      } catch (error) {
+        console.error("Failed to fetch projects or users:", error);
+        toast.error("Failed to load projects or users.");
+      }
     };
 
     fetchData();
@@ -72,6 +78,7 @@ export default function TechnicalDebtForm({ type, id }: Props) {
           });
         } catch (error) {
           console.error("Failed to fetch technical debt:", error);
+          toast.error("Failed to fetch technical debt data.");
         }
       };
       fetchDebt();
@@ -87,14 +94,19 @@ export default function TechnicalDebtForm({ type, id }: Props) {
       setLoading(true);
       if (type === "create") {
         await axios.post("/api/technical-debt", form);
+        toast.success("Technical debt created successfully!");
       } else {
         await axios.put(`/api/technical-debt/${id}`, form);
+        toast.success("Technical debt updated successfully!");
       }
       router.push("/technical-debt");
     } catch (err) {
       console.error(
         `${type === "create" ? "Creation" : "Update"} failed:`,
         err
+      );
+      toast.error(
+        `Failed to ${type === "create" ? "create" : "update"} debt item.`
       );
     } finally {
       setLoading(false);
