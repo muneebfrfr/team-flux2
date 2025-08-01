@@ -20,7 +20,7 @@ interface DataTablePageProps {
   createButtonText: string;
   createRoute: string;
   loading: boolean;
-  data: any[];
+  data: (object | string[] | number[])[];
   columns: MUIDataTableColumn[];
   options?: MUIDataTableOptions;
   children?: ReactNode;
@@ -41,7 +41,7 @@ export default function DataTablePage({
     ...column,
     options: {
       ...column.options,
-      customHeadLabelRender: (columnMeta: any) => (
+      customHeadLabelRender: () => (
         <Typography
           variant="subtitle2"
           sx={{

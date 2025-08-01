@@ -1,4 +1,3 @@
-// app/technical-debt/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -21,6 +20,7 @@ import {
 import { useRouter } from "next/navigation";
 import route from "@/route";
 import DataTablePage from "@/components/common/DataTablePage";
+import { MUIDataTableMeta } from "mui-datatables";
 
 interface Project {
   name: string;
@@ -104,7 +104,6 @@ export default function TechnicalDebtPage() {
     {
       name: "title",
       label: "Title",
-
       options: {
         filter: true,
         sort: true,
@@ -210,7 +209,7 @@ export default function TechnicalDebtPage() {
       options: {
         filter: false,
         sort: false,
-        customBodyRender: (value: any, tableMeta: any) => {
+        customBodyRender: (_value: unknown, tableMeta: MUIDataTableMeta) => {
           const item = debtItems[tableMeta.rowIndex];
           return (
             <Box display="flex" gap={1}>

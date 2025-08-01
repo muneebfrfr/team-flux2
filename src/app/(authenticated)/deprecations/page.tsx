@@ -11,6 +11,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import route from "@/route";
 import DataTablePage from "@/components/common/DataTablePage";
 import { Typography } from "@mui/material";
+import { MUIDataTableMeta } from "mui-datatables";
 
 interface Deprecation {
   id: string;
@@ -77,7 +78,7 @@ export default function DeprecationListPage() {
       options: {
         filter: true,
         sort: true,
-        customBodyRender: (value: string) => value || "-",
+        customBodyRender: (value: unknown) => (value as string) || "-",
       },
     },
     {
@@ -86,7 +87,7 @@ export default function DeprecationListPage() {
       options: {
         filter: true,
         sort: true,
-        customBodyRender: (value: string) => value || "-",
+        customBodyRender: (value: unknown) => (value as string) || "-",
       },
     },
     {
@@ -95,8 +96,8 @@ export default function DeprecationListPage() {
       options: {
         filter: true,
         sort: true,
-        customBodyRender: (value: string) =>
-          new Date(value).toLocaleDateString(),
+        customBodyRender: (value: unknown) =>
+          new Date(value as string).toLocaleDateString(),
       },
     },
     {
@@ -105,8 +106,8 @@ export default function DeprecationListPage() {
       options: {
         filter: true,
         sort: true,
-        customBodyRender: (value: string) =>
-          new Date(value).toLocaleDateString(),
+        customBodyRender: (value: unknown) =>
+          new Date(value as string).toLocaleDateString(),
       },
     },
     {
@@ -123,9 +124,10 @@ export default function DeprecationListPage() {
       options: {
         filter: true,
         sort: true,
-        customBodyRender: (value: { name: string }, tableMeta: any) => {
+        customBodyRender: (value: unknown, tableMeta: MUIDataTableMeta) => {
           const rowData = deprecations[tableMeta.rowIndex];
-          return value?.name || rowData.projectId;
+          const project = value as { name?: string };
+          return project?.name || rowData.projectId;
         },
       },
     },
@@ -135,8 +137,8 @@ export default function DeprecationListPage() {
       options: {
         filter: true,
         sort: true,
-        customBodyRender: (value: string) =>
-          new Date(value).toLocaleDateString(),
+        customBodyRender: (value: unknown) =>
+          new Date(value as string).toLocaleDateString(),
       },
     },
     {
@@ -145,8 +147,8 @@ export default function DeprecationListPage() {
       options: {
         filter: true,
         sort: true,
-        customBodyRender: (value: string) =>
-          new Date(value).toLocaleDateString(),
+        customBodyRender: (value: unknown) =>
+          new Date(value as string).toLocaleDateString(),
       },
     },
     {
@@ -155,7 +157,7 @@ export default function DeprecationListPage() {
       options: {
         filter: false,
         sort: false,
-        customBodyRender: (value: any, tableMeta: any) => {
+        customBodyRender: (_value: unknown, tableMeta: MUIDataTableMeta) => {
           const id = deprecations[tableMeta.rowIndex].id;
           return (
             <Box display="flex" justifyContent="center">
